@@ -1,0 +1,29 @@
+@import '~@angular/material/theming';
+
+.block {
+  border: 1px solid #E5E5E5;
+  border-radius: 10px;
+}
+
+.infoblock {
+  padding: 10px;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.block-active {
+  @include mat-elevation(2);
+  border: 1px solid #E5E5E5;
+  border-radius: 10px;
+}
+
+.checkbox {
+  font-family: Futura, Lato, Helvetica Neue, Helvetica, Arial, sans-serif; 
+  color: #545454;
+}
+
+.delivery-row:hover {
+  cursor: pointer;
+  background-color: #feeeed;
+}

@@ -1,0 +1,114 @@
+.block {
+  border: 1px solid #E5E5E5;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+}
+
+.skeleton-border {
+  border: 1px solid #E5E5E5;
+}
+
+body {
+  line-height: 1.25;
+}
+
+.mat-row:hover {
+  cursor: pointer;
+  background-color: #feeeed;
+}
+
+::ng-deep .mat-tab-label {
+  min-width: 80px !important;
+  padding: 6px;
+  font-weight: 500;
+}
+
+::ng-deep .mat-tab-label-active {
+  background-color: transparent;
+  color: #faada4;
+}
+
+@media (max-width: 480px) {
+  ::ng-deep .mat-tab-label {
+      min-width: 50px !important;
+      max-width: 100px !important;
+  }
+}
+
+@media screen and (max-width: 960px) {
+  .mat-table {
+    vertical-align: middle;
+  }
+
+  .mat-table caption {
+    font-size: 1em;
+  }
+
+  /*  Enable this to hide header
+  .mat-table .mat-header-cell {
+    
+    border: 10px solid;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+  */
+  .mat-table .mat-row {
+    border-bottom: 5px solid #ddd;
+    display: block;
+  }
+
+  .mat-row::after {
+    display: inline-block;
+    content: none;
+  }
+  /*
+  .mat-table .mat-row:nth-child(even) {background: #CCC}
+  .mat-table .mat-row:nth-child(odd) {background: #FFF}
+  */
+  .mat-table .mat-cell {
+    border-bottom: 1px solid #ddd;
+    display: block;
+    font-size: 1em;
+    text-align: right;
+    font-weight: bold;
+    padding-right: 5%;
+    padding-top: 12px;
+    padding-bottom: 0px;
+  }
+
+  .mat-table .mat-cell:before {
+    /*
+    * aria-label has no advantage, it won't be read inside a table
+    content: attr(aria-label);
+    */
+    content: attr(data-label);
+    float: left;
+    text-transform: uppercase;
+    font-weight: normal;
+    margin-left: 5%;
+    font-size: 0.85em;
+  }
+
+  .mat-table .mat-cell:first-of-type {
+    padding-left: 0px;
+  }
+
+  .mat-table .mat-cell:last-child {
+    border-bottom: 0;
+    height: 10px;
+    margin-bottom: 0px;
+  }
+  //   .mat-table .mat-cell:first-child {
+  //   margin-top: 4%;
+  // }
+}

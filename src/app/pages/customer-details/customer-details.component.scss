@@ -1,0 +1,44 @@
+.block {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+}
+
+.special-padding {
+  padding: 1.5rem;
+}
+
+.table-padding {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-row:hover {
+  cursor: pointer;
+  background-color: #feeeed;
+}
+
+a {
+  color: #f78274;
+}
+
+.section-table {
+  padding: 1.5rem;
+}
+
+@media (max-width: 800px) {
+  .section-table {
+      padding-top: 1.5rem;
+      padding-left: 0rem;
+      padding-right: 0rem;
+      padding-bottom: 1.5rem;
+  }
+
+  .side-padding {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+  }
+}

@@ -1,0 +1,144 @@
+<form [formGroup]="formGroup">
+    <!-- Name row -->
+    <div class="row">
+        <div class="col-12 col-md-5">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space">
+                    <mat-label>First formControlName</mat-label>
+                    <input matInput class="input-upper" formControlName="firstName"
+                        [(ngModel)]="userAddress.firstName" (change)="onChangeInput()"
+                        [errorStateMatcher]="matcher" required>
+                    <mat-error>This field is required.</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="col-4 col-md-2 npl">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space">
+                    <mat-label>Prefix</mat-label>
+                    <input matInput formControlName="lastNamePrefix"
+                        [(ngModel)]="userAddress.lastNamePrefix" (change)="onChangeInput()">
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="col-8 col-md-5 npls">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space">
+                    <mat-label>Last name</mat-label>
+                    <input matInput class="input-upper" formControlName="lastName"
+                        [(ngModel)]="userAddress.lastName" (change)="onChangeInput()"
+                        [errorStateMatcher]="matcher" required>
+                    <mat-error>This field is required.</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <!-- Address row -->
+    <div class="row">
+        <div class="col-md-9">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space">
+                    <mat-label>Address</mat-label>
+                    <input matInput class="input-upper" formControlName="street"
+                        placeholder="e.g. Prinses Beatrixlaan"
+                        [(ngModel)]="userAddress.street" (change)="onChangeInput()"
+                        [errorStateMatcher]="matcher" required>
+                    <mat-error>This field is required.</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="col-md-3 npl">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space">
+                    <mat-label>House No.</mat-label>
+                    <input matInput formControlName="houseNo"
+                        placeholder="e.g. 17A"
+                        [(ngModel)]="userAddress.houseNo" (change)="onChangeInput()"
+                        [errorStateMatcher]="matcher" required>
+                    <mat-error>This field is required.</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address 2 row -->
+    <div class="container p-0">
+        <mat-form-field [appearance]="appearance" class="smaller-space">
+            <mat-label>Address - line 2</mat-label>
+            <input matInput class="input-upper" formControlName="streetOther"
+                [(ngModel)]="userAddress.streetOther" (change)="onChangeInput()"
+                placeholder="e.g. Apartment, suite, floor no., etc.">
+        </mat-form-field>
+    </div>
+    <!-- City/Postcode row -->
+    <div class="row">
+        <div class="col-md-9">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space">
+                    <mat-label>City</mat-label>
+                    <input matInput class="input-upper" formControlName="city"
+                        placeholder="e.g. Amsterdam"
+                        [(ngModel)]="userAddress.city" (change)="onChangeInput()"
+                        [errorStateMatcher]="matcher" required>
+                    <mat-error>This field is required.</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="col-md-3 npl">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space">
+                    <mat-label>Postal Code</mat-label>
+                    <input matInput formControlName="postalCode" #postalCode maxlength="8"
+                        placeholder="e.g. 3545AA"
+                        [(ngModel)]="userAddress.postalCode" (change)="onChangeInput()"
+                        [errorStateMatcher]="matcher" required>
+                    <!-- <mat-hint align="end">{{postalCode.value.length}} / 6</mat-hint> -->
+                    <mat-error>This field is required.</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+    <!-- Country, Phone/Birth -->
+    <div class="row">
+        <div [ngClass]="currentUserData ? 'col-md-4' : 'col-12'">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space">
+                    <mat-label>Country</mat-label>
+                    <mat-select
+                        placeholder="Select a country"
+                        formControlName="country"
+                        [(ngModel)]="userAddress.country" (ngModelChange)="onChangeInput()"
+                        [errorStateMatcher]="matcher" required>
+                        <mat-option *ngFor="let country of countries" [value]="country[0]">
+                            {{country[1]}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error>You must make a selection.</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div *ngIf="currentUserData" class="col-md-4 nsp">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space">
+                    <mat-label>Mobile Number</mat-label>
+                    <input matInput formControlName="mobileNo" [(ngModel)]="currentUserData.mobileNo" (change)="onChangeInput()">
+                </mat-form-field>
+            </div>
+        </div>
+        <div *ngIf="currentUserData" class="col-md-4">
+            <div class="container p-0">
+                <mat-form-field [appearance]="appearance" class="smaller-space" (click)="picker.open()">
+                    <mat-label>Date of Birth</mat-label>
+                    <input matInput [matDatepicker]="picker" [min]="minDate" [max]="maxDate"
+                        formControlName="birthDate" [(ngModel)]="currentUserData.birthDate" (change)="onChangeInput()">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-error>You must make a selection.</mat-error>
+                    <mat-error *ngIf="mobileNoFormControl.hasError('pattern')">
+                        This field is required.
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</form>

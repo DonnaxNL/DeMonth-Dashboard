@@ -1,0 +1,139 @@
+<div class="container" style="padding-top: 2rem">
+    <div class="row">
+        <div class="col-12 col-md-9">
+            <h2>Manage coupons</h2>
+        </div>
+        <div class="col-12 col-md-3 d-flex justify-content-end">
+            <button mat-button (click)="openDialog()">Add new coupon</button>
+        </div>
+    </div>
+    <mat-tab-group mat-align-tabs="end" dynamicHeight>
+        <mat-tab label="Special ({{dataSourceMulti?.data.length}})">
+            <div class="container">
+                <mat-form-field>
+                    <mat-label>Filter</mat-label>
+                    <input matInput (keyup)="applyFilter($event, 'multi')" placeholder="Search">
+                </mat-form-field>
+
+                <mat-table [dataSource]="dataSourceMulti" class="mat-elevation-z4">
+
+                    <!-- Id Column -->
+                    <ng-container matColumnDef="id">
+                        <mat-header-cell *matHeaderCellDef> Coupon </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="id"> {{coupon.id}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="name"> {{coupon.name}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Discount Column -->
+                    <ng-container matColumnDef="discount">
+                        <mat-header-cell *matHeaderCellDef> Discount </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="discount"> {{coupon.discount}}% </mat-cell>
+                    </ng-container>
+
+                    <!-- Expire Date Column -->
+                    <ng-container matColumnDef="expireDate">
+                        <mat-header-cell *matHeaderCellDef> Expire Date </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="expireDate"> {{coupon.expireDate | date:'dd-MM-yy'}} </mat-cell>
+                    </ng-container>
+
+                    <!-- UsedBy Column -->
+                    <ng-container matColumnDef="usedBy">
+                        <mat-header-cell *matHeaderCellDef> Used </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="used">
+                            <span *ngIf="coupon.limit == null || coupon.limit == 0">{{coupon.usedBy.length}}x </span>
+                            <span
+                                *ngIf="coupon.limit && coupon.limit > 0">{{coupon.usedBy.length}}/{{coupon.limit}}</span>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Action Column -->
+                    <ng-container matColumnDef="action">
+                        <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="actions">
+                            <button mat-icon-button (click)="editCoupon(coupon, 'special')">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button (click)="deleteCoupon(coupon)"
+                                [disabled]="coupon.usedBy.length > 0">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                </mat-table>
+
+                <mat-paginator #multiPaginator [pageSizeOptions]="[25, 50, 100]" showFirstLastButtons></mat-paginator>
+            </div>
+        </mat-tab>
+        <mat-tab label="Single-use ({{dataSourceSingle?.data.length}})">
+            <div class="container">
+                <mat-form-field>
+                    <mat-label>Filter</mat-label>
+                    <input matInput (keyup)="applyFilter($event, 'single')" placeholder="Search">
+                </mat-form-field>
+
+                <mat-table [dataSource]="dataSourceSingle" matSort class="mat-elevation-z4">
+
+                    <!-- Id Column -->
+                    <ng-container matColumnDef="id">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Coupon </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="id"> {{coupon.id}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Description </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="name"> {{coupon.name}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Discount Column -->
+                    <ng-container matColumnDef="discount">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Discount </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="discount"> {{coupon.discount}}% </mat-cell>
+                    </ng-container>
+
+                    <!-- Used Column -->
+                    <ng-container matColumnDef="used">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Used </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="used"> {{coupon.used}} </mat-cell>
+                    </ng-container>
+
+                    <!-- UsedBy User Column -->
+                    <ng-container matColumnDef="usedByUid">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Used By</mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="used by" (click)="showUser(coupon)">
+                            <span *ngIf="coupon.usedByUser">
+                                {{coupon.usedByUser?.firstName + " " + coupon.usedByUser?.lastName}}
+                            </span>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Action Column -->
+                    <ng-container matColumnDef="action">
+                        <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+                        <mat-cell *matCellDef="let coupon" data-label="actions">
+                            <button mat-icon-button (click)="editCoupon(coupon, 'single')" [disabled]="coupon.used">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button (click)="deleteCoupon(coupon)" [disabled]="coupon.used">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumnsSingle"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumnsSingle;"></mat-row>
+                </mat-table>
+
+                <mat-paginator #singlePaginator [pageSizeOptions]="[25, 50, 100]" showFirstLastButtons></mat-paginator>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>

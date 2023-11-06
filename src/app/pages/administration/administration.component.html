@@ -1,0 +1,141 @@
+<mat-drawer-container class="example-container" autosize [hasBackdrop]="isMobile">
+    <mat-drawer #drawer mode="over" [opened]="!isMobile">
+        <h3 class="sidenav-header">Administration</h3>
+        <hr>
+        <mat-nav-list>
+            <mat-list-item (click)="changePage(0); isMobile ? drawer.toggle() : null">
+                <p matLine>Statistics</p>
+            </mat-list-item>
+            <mat-list-item (click)="changePage(1); isMobile ? drawer.toggle() : null">
+                <p matLine>Insights</p>
+            </mat-list-item>
+            <mat-list-item (click)="changePage(2); isMobile ? drawer.toggle() : null">
+                <p matLine>Distribution</p>
+            </mat-list-item>
+            <mat-list-item (click)="changePage(3); isMobile ? drawer.toggle() : null">
+                <p matLine>Google Data Studio</p>
+            </mat-list-item>
+        </mat-nav-list>
+        <hr>
+        <mat-nav-list>
+            <mat-list-item (click)="allPayments(); isMobile ? drawer.toggle() : null">
+                <p matLine>Payments</p>
+                <mat-icon>launch</mat-icon>
+            </mat-list-item>
+        </mat-nav-list>
+    </mat-drawer>
+
+    <div class="main">
+        <div class="row m-0" *ngIf="isMobile">
+            <div class="col-auto my-auto">
+                <p class="link" (click)="drawer.toggle()" matRipple>
+                    <i class="mr-2 fas fa-chevron-left"></i>
+                    <span class="link-text">Menu</span>
+                </p>
+            </div>
+            <div class="pt-2 col d-flex my-auto justify-content-start" *ngIf="isMobile">
+                <h2>{{menuSelected.name}}</h2>
+            </div>
+        </div>
+        <ng-container *ngIf="menuSelected.id == 'statistics'">
+            <insight-statistics [allOrders]="orders" [allRawOrders]="rawOrders"></insight-statistics>
+        </ng-container>
+        <ng-container *ngIf="menuSelected.id == 'insights'">
+            <insight-reports [allOrders]="orders" [allRawOrders]="rawOrders"></insight-reports>
+        </ng-container>
+        <ng-container *ngIf="menuSelected.id == 'distribution'">
+            <div class="container">
+                <h3 class="header-spacing mb-3">{{menuSelected.name}}</h3>
+                <div class="row">
+                    <div class="col-12 col-md-6 order-2 order-md-2 mb-2">
+                        <div class="card">
+                            <h5 class="pt-3 text-center">Product distribution</h5>
+                            <div class="chart" style="height: 250px; padding: 10px;">
+                                <canvas baseChart [data]="pieChartData" [labels]="pieChartLabels" [options]="pieChartOptions"
+                                    [chartType]="pieChartType" [colors]="pieChartColors"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 order-4 order-md-3 mb-2">
+                        <div class="card">
+                            <h5 class="pt-3 text-center">Chosen box</h5>
+                            <div class="chart" style="height: 250px; padding: 10px;">
+                                <canvas baseChart [data]="boxChartData" [labels]="boxChartLabels" [options]="pieChartOptions"
+                                    [chartType]="pieChartType" [colors]="boxChartColors"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 order-3 order-md-4 mb-4">
+                        <mat-accordion>
+                            <mat-expansion-panel (opened)="panelProductsOpenState = true"
+                                (closed)="panelProductsOpenState = false">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{panelProductsOpenState ? 'Hide' : 'Show'}} details
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <mat-table [dataSource]="dataSourceProducts">
+        
+                                    <!--- Note that these columns can be defined in any order.
+                                                      The actual rendered columns are set as a property on the row definition" -->
+        
+                                    <!-- Product Column -->
+                                    <ng-container matColumnDef="product">
+                                        <mat-header-cell *matHeaderCellDef> Product</mat-header-cell>
+                                        <mat-cell *matCellDef="let product" data-label="Product"> {{product.name}} </mat-cell>
+                                    </ng-container>
+        
+                                    <!-- Selected Column -->
+                                    <ng-container matColumnDef="amount" class="mat-column-amount">
+                                        <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
+                                        <mat-cell *matCellDef="let product" data-label="Amount"> {{product.amount}} </mat-cell>
+                                    </ng-container>
+        
+                                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                                </mat-table>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+                    <div class="col-12 col-md-6 order-5 order-md-5 mb-4">
+                        <mat-accordion>
+                            <mat-expansion-panel (opened)="panelBoxesOpenState = true" (closed)="panelBoxesOpenState = false">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{panelBoxesOpenState ? 'Hide' : 'Show'}} details
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <mat-table [dataSource]="dataSourceBoxes">
+        
+                                    <!--- Note that these columns can be defined in any order.
+                                                    The actual rendered columns are set as a property on the row definition" -->
+        
+                                    <!-- Product Column -->
+                                    <ng-container matColumnDef="box">
+                                        <mat-header-cell *matHeaderCellDef> Box </mat-header-cell>
+                                        <mat-cell *matCellDef="let product" data-label="Product"> {{product.name}} </mat-cell>
+                                    </ng-container>
+        
+                                    <!-- Selected Column -->
+                                    <ng-container matColumnDef="amount" class="mat-column-amount">
+                                        <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
+                                        <mat-cell *matCellDef="let product" data-label="Amount"> {{product.amount}} </mat-cell>
+                                    </ng-container>
+        
+                                    <mat-header-row *matHeaderRowDef="displayedColumnsBox"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: displayedColumnsBox;"></mat-row>
+                                </mat-table>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="menuSelected.id == 'datastudio'">
+            <div class="container">
+                <h3 class="header-spacing mb-3">{{menuSelected.name}}</h3>
+                <iframe src="https://datastudio.google.com/embed/reporting/ee14da8c-3c17-4458-a6fe-247f935416ee/page/qg1rB" width="100%" height="500px"></iframe>
+            </div>
+        </ng-container>
+    </div>
+</mat-drawer-container>

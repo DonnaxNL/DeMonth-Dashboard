@@ -1,0 +1,69 @@
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <a class="navbar-brand" routerLink="/" href="#">
+        DeMonth Dashboard
+    </a>
+
+    <button *ngIf="loggedIn" class="navbar-toggler" type="button" (click)="toggleNavbar()" data-toggle="collapse"
+        data-target=".dual-nav">
+        <i class="fas" [ngClass]="{'fa-bars': !navbarOpen, 'fa-times': navbarOpen}"></i>
+    </button>
+
+    <div *ngIf="loggedIn" class="collapse navbar-collapse" [ngClass]="{ 'show': navbarOpen }">
+        <ul class="navbar-nav mr-auto">
+            <!-- Deliveries -->
+            <li class="nav-item" (click)="navbarOpen=false">
+                <a class="nav-link" routerLink="/deliveries" href="#">Deliveries</a>
+            </li>
+            <!-- Orders -->
+            <li class="nav-item" (click)="navbarOpen=false">
+                <a class="nav-link" routerLink="/orders" href="#">Subscriptions</a>
+            </li>
+            <!-- Inventory
+            <li class="nav-item" (click)="navbarOpen=false">
+                <a class="nav-link" routerLink="/inventory" href="#">Inventory</a>
+            </li> -->
+            <!-- Customer -->
+            <li class="nav-item" (click)="navbarOpen=false">
+                <a class="nav-link" routerLink="/customers" href="#">Customers</a>
+            </li>
+            <!-- Inventory -->
+            <li class="nav-item" (click)="navbarOpen=false">
+                <a class="nav-link" routerLink="/administration" href="#">Administration</a>
+            </li>
+            <div class="nav-link dropdown">
+                <li class="nav-item dropdown-toggle" [matMenuTriggerFor]="navMenu">More</li>
+            </div>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item mr-2">
+                <input type="text" class="form-control" [(ngModel)]="searchInput"
+                    placeholder="Search by Id or Reference" (keyup.enter)="searchOrder()">
+            </li>
+            <li class="nav-item">
+                <div *ngIf="navbarOpen">
+                    <a class="nav-link" (click)="signOut()">Sign out</a>
+                </div>
+                <div *ngIf="!navbarOpen">
+                    <button mat-button matSuffix mat-icon-button (click)="signOut()">
+                        <i class="fas fa-sign-out-alt brand-white" tooltip="Sign out"></i>
+                    </button>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<mat-menu #navMenu="matMenu">
+    <!-- <button mat-menu-item (click)="navbarOpen=false" routerLink="/insights">
+        <span>Insights</span>
+    </button> -->
+    <button mat-menu-item (click)="navbarOpen=false" routerLink="/coupons">
+        <span>Coupons</span>
+    </button>
+    <button mat-menu-item href="https://www.mollie.com/dashboard/org_4085344/payments"
+        target="_blank" [hidden]="!userRole[4]">
+        <span>Payments</span>
+        <mat-icon class="ml-1">launch</mat-icon>
+    </button>
+</mat-menu>

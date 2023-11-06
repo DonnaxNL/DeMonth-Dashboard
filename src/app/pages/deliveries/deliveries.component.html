@@ -1,0 +1,200 @@
+<div class="container" style="padding-top: 2rem">
+    <div class="row">
+        <div class="col-12 col-md-8">
+            <h3>Deliveries</h3>
+        </div>
+        <div class="col-12 col-md-4 d-flex justify-content-end">
+            <section layout="row">
+                <button mat-button (click)="dateSelected('previous')"
+                    [disabled]="currentWeek == firstWeekNo - 4 || !dataLoaded">
+                    Previous
+                </button>
+                <button mat-button (click)="dateSelected('current')">
+                    Today
+                </button>
+                <button mat-button (click)="dateSelected('next')">
+                    Next
+                </button>
+            </section>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 col-lg-3">
+            <div class="sticky-top">
+                <h4 *ngIf="dataLoaded" class="pt-2 pb-2">Week {{currentWeek}}</h4>
+                <ngx-skeleton-loader *ngIf="!dataLoaded" [theme]="{ width: '100px', height: '30px'}"></ngx-skeleton-loader>
+                <div *ngIf="!isMobile" class="calendar-wrapper block mb-4">
+                    <mat-calendar *ngIf="dataLoaded" #calendar [minDate]="minDate" [(selected)]="selectedDate"
+                        (selectedChange)="dateSelected($event)">
+                    </mat-calendar>
+                    <div *ngIf="!dataLoaded" style="padding-top: 10px; padding-left: 10px; padding-right: 10px">
+                        <ngx-skeleton-loader [theme]="{ width: '100%', height: '200px'}"></ngx-skeleton-loader>
+                    </div>
+                </div>
+                <div *ngIf="isMobile" class="mb-4">
+                    <div class="row">
+                        <div class="col-10">
+                            <h5>Show calendar</h5>
+                        </div>
+                        <div class="col-2 d-flex justify-content-end">
+                            <i class="fas fa-chevron-down" *ngIf="!showCalendar" (click)="showCalendar = true"></i>
+                            <i class="fas fa-chevron-up" *ngIf="showCalendar" (click)="showCalendar = false"></i>
+                        </div>
+                    </div>
+                    <mat-calendar *ngIf="showCalendar" class="calendar-wrapper block mb-2" #calendar [minDate]="minDate"
+                        [(selected)]="selectedDate" (selectedChange)="dateSelected($event)">
+                    </mat-calendar>
+                </div>
+                <div *ngIf="dataLoaded && outdatedDeliveries.length > 0" class="block mb-4"
+                    style="padding: 1rem; background-color: rgba(243, 21, 21, 0.76);">
+                    <div class="row">
+                        <div class="col-10">
+                            <p style="color: white;">Action needed - {{outdatedDeliveries.length}}</p>
+                        </div>
+                        <div class="col-2 my-auto d-flex justify-content-end" style="color: white;">
+                            <i class="fas fa-chevron-down" *ngIf="!showOutdated" (click)="showOutdated = true"></i>
+                            <i class="fas fa-chevron-up" *ngIf="showOutdated" (click)="showOutdated = false"></i>
+                        </div>
+                    </div>
+                    <div *ngIf="showOutdated" class="mt-1">
+                        <div *ngFor="let delivery of outdatedDeliveries; let i = index">
+                            <a href="#" routerLink="/orders/{{delivery.orderId}}">
+                                {{delivery.orderRef}} ({{delivery.subscriptionStatus | titlecase}})
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-6 col-md-12">
+                        <div class="block mb-2">
+                            <div class="infoblock">
+                                <p *ngIf="dataLoaded">
+                                    Week {{deliveryCount[0].weekNo}} - {{deliveryCount[0].weekCount}}
+                                    <span *ngIf="!isMobile">deliveries</span>
+                                </p>
+                                <ngx-skeleton-loader *ngIf="!dataLoaded" class="w-100" [theme]="{ margin: '0px'}"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-12">
+                        <div class="block mb-2">
+                            <div class="infoblock">
+                                <p *ngIf="dataLoaded">
+                                    Week {{deliveryCount[1].weekNo}} - {{deliveryCount[1].weekCount}}
+                                    <span *ngIf="!isMobile">deliveries</span>
+                                </p>
+                                <ngx-skeleton-loader *ngIf="!dataLoaded" class="w-100" [theme]="{ margin: '0px'}"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-12">
+                        <div class="block mb-2">
+                            <div class="infoblock">
+                                <p *ngIf="dataLoaded">
+                                    Week {{deliveryCount[2].weekNo}} - {{deliveryCount[2].weekCount}}
+                                    <span *ngIf="!isMobile">deliveries</span>
+                                </p>
+                                <ngx-skeleton-loader *ngIf="!dataLoaded" class="w-100" [theme]="{ margin: '0px'}"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-12">
+                        <div class="block mb-4">
+                            <div class="infoblock">
+                                <p *ngIf="dataLoaded">
+                                    Week {{deliveryCount[3].weekNo}} - {{deliveryCount[3].weekCount}}
+                                    <span *ngIf="!isMobile">deliveries</span>
+                                </p>
+                                <ngx-skeleton-loader *ngIf="!dataLoaded" class="w-100" [theme]="{ margin: '0px'}"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-12">
+                        <div class="block mb-2">
+                            <div class="infoblock">
+                                <p *ngIf="dataLoaded">Packed: {{currentDeliveryStatus[0]}}/{{currentDeliveries}}</p>
+                                <ngx-skeleton-loader *ngIf="!dataLoaded" [theme]="{ width: '100px', margin: '0px'}"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-12">
+                        <div class="block mb-4">
+                            <div class="infoblock">
+                                <p *ngIf="dataLoaded">Shipped: {{currentDeliveryStatus[1]}}/{{currentDeliveries}}</p>
+                                <ngx-skeleton-loader *ngIf="!dataLoaded" [theme]="{ width: '100px', margin: '0px'}"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-9">
+            <h4 *ngIf="dataLoaded" class="text-center pt-2 pb-2">{{weekDates[0] | date:'MMMM d'}} - {{weekDates[6] | date:'MMMM d'}}</h4>
+            <div *ngIf="!dataLoaded" class="col d-flex mx-auto my-auto justify-content-center">
+                <ngx-skeleton-loader [theme]="{ width: '200px', height: '30px'}"></ngx-skeleton-loader>
+            </div>
+            <div *ngIf="dataLoaded">
+                <div *ngFor="let date of weekDates; let i = index">
+                    <div class="mb-3" [ngClass]="selectedIndex == i ? 'block-active':'block'" style="padding: 1rem">
+                        <div class="row">
+                            <div class="col-11 d-flex justify-content-start">
+                                <h5>{{date.toDate() | date:'dd-MM'}} - {{weekDays[i]}}</h5>
+                            </div>
+                        </div>
+                        <div *ngFor="let item of deliveries[i]; let j = index" class="row delivery-row">
+                            <div class="row col-10 col-md-11">
+                                <p class="col-5 col-md-2 order-md-1 my-auto" (click)="showDetails(item)">
+                                    <span>{{item.orderRef}}</span>
+                                </p>
+                                <p class="col-auto col-md-4 order-md-2 my-auto" (click)="showDetails(item)">{{item.customer}}</p>
+                                <mat-checkbox class='checkbox col-5 col-md-3 order-md-3 pt-2'
+                                    (click)="$event.stopPropagation()" (change)="setDeliveryStatus($event, item, false)"
+                                    [disabled]="!userRole[2]" [checked]="item.deliveryItem.packing?.isPacked"
+                                    #tooltip="matTooltip" matTooltip="Packed by: {{item.deliveryItem.packing?.packedBy}}">
+                                    Packed
+                                </mat-checkbox>
+                                <mat-checkbox class='checkbox col-4 col-md-3 order-md-4 pt-2'
+                                    (click)="$event.stopPropagation()" (change)="setDeliveryStatus($event, item, true)"
+                                    [checked]="item.deliveryItem.delivery?.isDelivered"
+                                    [disabled]="!item.deliveryItem.packing?.isPacked || !userRole[2]" #tooltip="matTooltip"
+                                    matTooltip="Shipping initiated by: {{item.deliveryItem.delivery?.deliveryInitiatedBy}}">
+                                    Shipped
+                                </mat-checkbox>
+                            </div>
+                            <div class="col d-flex mx-auto my-auto justify-content-center">
+                                <button mat-icon-button (click)="showDetails(item)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <mat-divider class="w-100 ml-2 mr-2" *ngIf="j != (deliveries[i].length-1)"></mat-divider>
+                        </div>
+                        <div *ngIf="deliveries[i] == undefined">
+                            <p>No deliveries.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!dataLoaded">
+                <div *ngFor="let date of weekDays; let i = index">
+                    <div class="mb-3 block" style="padding-top: 1rem; padding-left: 1rem; padding-right: 1rem">
+                        <div class="row mb-3">
+                            <div class="col-11 d-flex justify-content-start">
+                                <ngx-skeleton-loader [theme]="{ width: '150px', margin: '0px'}"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                        <div>
+                            <ngx-skeleton-loader count="5"></ngx-skeleton-loader>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div *ngIf="!dataLoaded">
+        <div class="mt-4 col-12 d-flex justify-content-center">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div> -->
+</div>

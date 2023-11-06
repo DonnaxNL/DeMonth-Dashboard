@@ -1,0 +1,264 @@
+<div class="container" style="padding-top: 1.5rem">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/" href="#">Home</a></li>
+            <li class="breadcrumb-item"><a routerLink="/customers" href="#">Customers</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{customer?.firstName}} {{customer?.lastName}}</li>
+        </ol>
+    </nav>
+
+    <!-- Content -->
+    <div class="block special-padding">
+        <!-- Header -->
+        <div class="row">
+            <div class="col-10 col-md-9 d-flex my-auto justify-content-start">
+                <h4>
+                    {{customer?.firstName}} 
+                    <span *ngIf="customer?.lastNamePrefix">
+                        {{customer?.lastNamePrefix}} 
+                    </span>
+                    {{customer?.lastName}}
+                </h4>
+            </div>
+            
+            <div class="col-2 col-md-3 d-flex justify-content-end">
+                <button mat-icon-button [matMenuTriggerFor]="menuOrder" [disabled]="!userRole[2]">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menuOrder="matMenu">
+                    <button mat-menu-item (click)="openInFirebase()">
+                        <mat-icon>launch</mat-icon>
+                        <span>Open in Firebase</span>
+                    </button>
+                    <button mat-menu-item disabled>
+                        <mat-icon>edit</mat-icon>
+                        <span>Edit details</span>
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <p>ID: {{customerId}}</p>
+            </div>
+            <div class="col-12 col-md-6" [hidden]="!userRole[2]">
+                <p>
+                    Mollie Customer ID: 
+                    <a href="https://www.mollie.com/dashboard/org_11302067/customers/{{customer?.mollieCustomerId}}"
+                        target="_blank">{{customer?.mollieCustomerId}}</a>
+                </p>
+                <p *ngIf="customer?.mollieCustomerIdOld">
+                    Mollie Customer ID Old: 
+                    <a href="https://www.mollie.com/dashboard/org_4085344/customers/{{customer?.mollieCustomerIdOld}}"
+                        target="_blank">{{customer?.mollieCustomerIdOld}}</a>
+                </p>
+            </div>
+        </div>
+        <!-- Details -->
+        <div class="row mt-4">
+            <div class="col-md-6 mb-4">
+                <h6>Customer details</h6>
+                <div class="row">
+                    <h6 class="col-4 d-flex justify-content-start">
+                        Name
+                    </h6>
+                    <div class="col-8 d-flex justify-content-start">
+                        <p>
+                            {{customer?.firstName}}
+                            <span *ngIf="customer?.lastNamePrefix">
+                                {{customer.lastNamePrefix}}
+                            </span>
+                            {{customer?.lastName}}
+                        </p>
+                    </div>
+                    <h6 class="col-4 d-flex justify-content-start">
+                        Email
+                    </h6>
+                    <p class="col-8 d-flex justify-content-start">
+                        {{customer?.email}}
+                    </p>
+                    <h6 class="col-6 col-md-4 d-flex justify-content-start">
+                        Phone number
+                    </h6>
+                    <p class="col-6 col-md-8 d-flex justify-content-start">
+                        <span *ngIf="customer?.mobileNo">
+                            {{customer?.mobileNo}}
+                        </span>
+                        <span *ngIf="!customer?.mobileNo">
+                            No mobile number given.
+                        </span>
+                    </p>
+                    <h6 class="col-6 col-md-4 d-flex justify-content-start">
+                        Date of birth
+                    </h6>
+                    <p class="col-6 col-md-8 d-flex justify-content-start">
+                        <span *ngIf="customer?.birthDate">
+                            {{customer?.birthDate?.seconds * 1000 | date:'dd-MM-yyyy'}}
+                        </span>
+                        <span *ngIf="!customer?.birthDate">
+                            No birth date given.
+                        </span>
+                    </p>
+                    <h6 class="col-6 col-md-4 d-flex justify-content-start">
+                        Cycle
+                    </h6>
+                    <p class="col-6 col-md-8 d-flex justify-content-start">
+                        <span *ngIf="customer?.cycleDetails">
+                            {{customer?.cycleDetails?.cycleDays}} days
+                        </span>
+                    </p>
+                    <h6 class="col-6 col-md-4 d-flex justify-content-start">
+                        DeMonthly Points
+                    </h6>
+                    <p class="col-6 col-md-8 d-flex justify-content-start">
+                        <span *ngIf="customer?.points">
+                            Current: {{customer?.points?.current}}<br>
+                            Lifetime: {{customer?.points?.lifetime}}
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6>Address</h6>
+                <address-view [userAddress]="customer?.address"></address-view>
+            </div>
+        </div>
+    </div>
+    <!-- Subscriptions -->
+    <div class="block section-table mt-3">
+        <div class="row side-padding">
+            <div class="col-9 d-flex my-auto justify-content-start">
+                <h5>Subscriptions</h5>
+            </div>
+            <div class="col-3 d-flex justify-content-end">
+                <button mat-icon-button [matMenuTriggerFor]="menuSubscriptions">
+                    <mat-icon matTooltip="More">more_vert</mat-icon>
+                </button>
+                <mat-menu #menuSubscriptions="matMenu">
+                    <button mat-menu-item (click)="showHiddenSubscriptions()">
+                        <div *ngIf="!showHidden">
+                            Show hidden subscriptions ({{allSubscriptionList.length - subscriptionList.length}})
+                        </div>
+                        <div *ngIf="showHidden">
+                            Hide hidden subscriptions
+                        </div>
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+        
+        <mat-table [dataSource]="dataSourceOrders">
+
+            <!-- Ref Column -->
+            <ng-container matColumnDef="orderRef">
+                <mat-header-cell *matHeaderCellDef> Reference </mat-header-cell>
+                <mat-cell *matCellDef="let order" data-label="Reference"> {{order.orderRef}} </mat-cell>
+            </ng-container>
+
+            <!-- Box Column -->
+            <ng-container matColumnDef="boxName">
+                <mat-header-cell *matHeaderCellDef> Box </mat-header-cell>
+                <mat-cell *matCellDef="let order" data-label="Box"> {{order.boxName}} </mat-cell>
+            </ng-container>
+
+            <!-- Plan Column -->
+            <ng-container matColumnDef="paymentPlan">
+                <mat-header-cell *matHeaderCellDef> Payment Plan </mat-header-cell>
+                <mat-cell *matCellDef="let order" data-label="Plan">
+                    <span *ngIf="order.paymentPlan == 0 && order.fullOrder.checkoutSummary.points">
+                        DMP claim
+                    </span>
+                    <span *ngIf="order.paymentPlan == 0 && !order.fullOrder.checkoutSummary.points">
+                        Free referral box
+                    </span>
+                    <span *ngIf="order.paymentPlan == 1">Monthly</span>
+                    <span *ngIf="order.paymentPlan > 1">
+                        {{order.paymentPlan}} month plan
+                    </span>
+                </mat-cell>
+            </ng-container>
+
+            <!-- Cycle Days Column -->
+            <ng-container matColumnDef="cycleDays">
+                <mat-header-cell *matHeaderCellDef> Cycle Days </mat-header-cell>
+                <mat-cell *matCellDef="let order" data-label="Cycle"> {{order.cycleDays}} </mat-cell>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+                <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+                <mat-cell *matCellDef="let order" data-label="Status"> {{order.status | titlecase}} </mat-cell>
+            </ng-container>
+
+            <!-- Created Column -->
+            <ng-container matColumnDef="created">
+                <mat-header-cell *matHeaderCellDef> Order Created </mat-header-cell>
+                <mat-cell *matCellDef="let order" data-label="Created"> {{order.created | date:'dd-MM-yyyy'}}
+                </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showOrderDetails(row)"></mat-row>
+        </mat-table>
+        <p *ngIf="dataSourceOrders == null || dataSourceOrders?.length == 0" class="mt-2 col-12 text-center">No
+            subscriptions made.</p>
+    </div>
+    <!-- Payments -->
+    <div class="block section-table mt-3 mb-3">
+        <div class="row side-padding">
+            <div class="col-9 d-flex my-auto justify-content-start">
+                <h5>Payments</h5>
+            </div>
+            <div class="col-3 d-flex justify-content-end">
+                <button mat-icon-button [matMenuTriggerFor]="menuPayments">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menuPayments="matMenu">
+                    <button mat-menu-item (click)="showExpiredPayments()">
+                        <div *ngIf="!showExpired">
+                            Show expired payments
+                        </div>
+                        <div *ngIf="showExpired">
+                            Hide expired payments
+                        </div>
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+        <table mat-table [dataSource]="dataSourcePayments">
+
+            <!--- Note that these columns can be defined in any order.
+                              The actual rendered columns are set as a property on the row definition" -->
+
+            <!-- Id Column -->
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef>Description</th>
+                <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+            </ng-container>
+
+            <!-- Date Column -->
+            <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Created</th>
+                <td mat-cell *matCellDef="let element"> {{element.date | date:'dd-MM-yyyy'}}
+                </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+            </ng-container>
+
+            <!-- amount Column -->
+            <ng-container matColumnDef="amount">
+                <th mat-header-cell *matHeaderCellDef>Amount</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.amount | currency:'EUR':'symbol':'1.2-2':'nl'}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsPayments"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumnsPayments;"></tr>
+        </table>
+        <p *ngIf="paymentList == null || paymentList?.length == 0" class="mt-2 col-12 text-center">No payments made.</p>
+    </div>
+</div>

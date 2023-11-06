@@ -1,0 +1,246 @@
+<div style="padding-left: 2rem; padding-right: 2rem; padding-top: 2rem">
+    <div class="row">
+        <div class="col-6">
+            <h3>Inventory
+                <span [hidden]="!dataLoaded || isMobile"> - Week {{currentWeek}}</span>
+            </h3>
+            <h6 [hidden]="!dataLoaded || isMobile">{{weekDates[0] | date:'MMMM d'}} - {{weekDates[6] | date:'MMMM d'}}
+            </h6>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <button mat-button (click)="addInventory()" [disabled]="!dataLoaded">
+                Mass add inventory
+            </button>
+        </div>
+    </div>
+    <div [hidden]="!isMobile">
+        <hr>
+        <h3>Please use this page on the desktop or in landscape mode.</h3>
+    </div>
+    <mat-tab-group mat-align-tabs="center" dynamicHeight [hidden]="isMobile">
+        <mat-tab label="Menstrual Products">
+            <div [hidden]="!dataLoaded">
+                <mat-table [dataSource]="dataSourceMenstrualProducts">
+
+                    <!--- Note that these columns can be defined in any order.
+                                                      The actual rendered columns are set as a property on the row definition" -->
+
+                    <!-- Type Column -->
+                    <ng-container matColumnDef="type">
+                        <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Type"> {{product.type}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Brand Column -->
+                    <ng-container matColumnDef="brand">
+                        <mat-header-cell *matHeaderCellDef> Brand </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Brand"> {{product.brand}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Product Column -->
+                    <ng-container matColumnDef="product">
+                        <mat-header-cell *matHeaderCellDef> Product </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Product"> {{product.name}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Inventory Column -->
+                    <ng-container matColumnDef="inventory">
+                        <mat-header-cell *matHeaderCellDef> Inventory </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Inventory">
+                            <mat-form-field style="width: 50px;">
+                                <input matInput type="number" min="0" (ngModelChange)="onInventoryChanged()"
+                                    [(ngModel)]="inventoryAmounts[product.firestoreInfo.type][product.firestoreInfo.brand][product.firestoreInfo.id]">
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Used Column -->
+                    <ng-container matColumnDef="used">
+                        <mat-header-cell *matHeaderCellDef> Used </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="used">
+                            <mat-progress-bar class="w-50" mode="determinate"
+                                [color]="product.used < 60 ? 'primary' : 'warn'" [value]="product.used">
+                            </mat-progress-bar>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Packed amount Column -->
+                    <!-- <ng-container matColumnDef="packed">
+                        <mat-header-cell *matHeaderCellDef> Packed </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Packed"> {{product.packed}} </mat-cell>
+                    </ng-container> -->
+
+                    <!-- Amount Column -->
+                    <ng-container matColumnDef="amount">
+                        <mat-header-cell *matHeaderCellDef> This week </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Amount"> {{product.amount}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Remaining Column -->
+                    <ng-container matColumnDef="remaining">
+                        <mat-header-cell *matHeaderCellDef> Remaining </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Remaining">
+                            {{inventoryRemaining[product.firestoreInfo.type][product.firestoreInfo.brand][product.firestoreInfo.id]}}
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedProductsColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedProductsColumns;"></mat-row>
+                </mat-table>
+            </div>
+            <div [hidden]="dataLoaded">
+                <div class="mt-4 col-12 d-flex justify-content-center">
+                    <mat-spinner></mat-spinner>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Care Products">
+            <div [hidden]="!dataLoaded">
+                <mat-table [dataSource]="dataSourceCareProducts">
+
+                    <!--- Note that these columns can be defined in any order.
+                                                        The actual rendered columns are set as a property on the row definition" -->
+
+                    <!-- Type Column -->
+                    <ng-container matColumnDef="type">
+                        <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Type"> {{product.type}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Brand Column -->
+                    <ng-container matColumnDef="brand">
+                        <mat-header-cell *matHeaderCellDef> Brand </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Brand"> {{product.brand}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Product Column -->
+                    <ng-container matColumnDef="product">
+                        <mat-header-cell *matHeaderCellDef> Product </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Product"> {{product.name}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Inventory Column -->
+                    <ng-container matColumnDef="inventory">
+                        <mat-header-cell *matHeaderCellDef> Inventory </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Inventory">
+                            <mat-form-field style="width: 50px;">
+                                <input *ngIf="product.firestoreInfo.brand" matInput type="number" min="0"
+                                    (ngModelChange)="onInventoryChanged()"
+                                    [(ngModel)]="inventoryAmounts[product.firestoreInfo.type][product.firestoreInfo.brand][product.firestoreInfo.id]">
+                                <input *ngIf="!product.firestoreInfo.brand" matInput type="number" min="0"
+                                    (ngModelChange)="onInventoryChanged()"
+                                    [(ngModel)]="inventoryAmounts[product.firestoreInfo.id]">
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Used Column -->
+                    <ng-container matColumnDef="used">
+                        <mat-header-cell *matHeaderCellDef> Used </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="used">
+                            <mat-progress-bar class="w-50" mode="determinate"
+                                [color]="product.used < 60 ? 'primary' : 'warn'" [value]="product.used">
+                            </mat-progress-bar>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Amount Column -->
+                    <ng-container matColumnDef="amount">
+                        <mat-header-cell *matHeaderCellDef> This Week </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Amount"> {{product.amount}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Remaining Column -->
+                    <ng-container matColumnDef="remaining">
+                        <mat-header-cell *matHeaderCellDef> Remaining </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Remaining">
+                            <span *ngIf="product.firestoreInfo.brand">
+                                {{inventoryRemaining[product.firestoreInfo.type][product.firestoreInfo.brand][product.firestoreInfo.id]}}
+                            </span>
+                            <span
+                                *ngIf="!product.firestoreInfo.brand">{{inventoryRemaining[product.firestoreInfo.id]}}</span>
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedProductsColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedProductsColumns;"></mat-row>
+                </mat-table>
+            </div>
+            <div [hidden]="dataLoaded">
+                <div class="mt-4 col-12 d-flex justify-content-center">
+                    <mat-spinner></mat-spinner>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Snacks">
+            <div [hidden]="!dataLoaded">
+                <mat-table [dataSource]="dataSourceSnacks">
+
+                    <!--- Note that these columns can be defined in any order.
+                                                        The actual rendered columns are set as a property on the row definition" -->
+
+                    <!-- Type Column -->
+                    <ng-container matColumnDef="type">
+                        <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Type"> {{product.type}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Brand Column -->
+                    <ng-container matColumnDef="brand">
+                        <mat-header-cell *matHeaderCellDef> Brand </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Brand"> {{product.brand}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Product Column -->
+                    <ng-container matColumnDef="product">
+                        <mat-header-cell *matHeaderCellDef> Product </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Product"> {{product.name}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Inventory Column -->
+                    <ng-container matColumnDef="inventory">
+                        <mat-header-cell *matHeaderCellDef> Inventory </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Inventory">
+                            <mat-form-field style="width: 50px;">
+                                <input matInput type="number" min="0" (ngModelChange)="onInventoryChanged()"
+                                    [(ngModel)]="inventoryAmounts[product.firestoreInfo.type][product.firestoreInfo.brand][product.firestoreInfo.id]">
+                            </mat-form-field>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Used Column -->
+                    <ng-container matColumnDef="used">
+                        <mat-header-cell *matHeaderCellDef> Used </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="used">
+                            <mat-progress-bar class="w-50" mode="determinate"
+                                [color]="product.used < 60 ? 'primary' : 'warn'" [value]="product.used">
+                            </mat-progress-bar>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Amount Column -->
+                    <ng-container matColumnDef="amount">
+                        <mat-header-cell *matHeaderCellDef> This week </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Amount"> {{product.amount}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Remaining Column -->
+                    <ng-container matColumnDef="remaining">
+                        <mat-header-cell *matHeaderCellDef> Remaining </mat-header-cell>
+                        <mat-cell *matCellDef="let product" data-label="Remaining">
+                            {{inventoryRemaining[product.firestoreInfo.type][product.firestoreInfo.brand][product.firestoreInfo.id]}}
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedProductsColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedProductsColumns;"></mat-row>
+                </mat-table>
+            </div>
+            <div [hidden]="dataLoaded">
+                <div class="mt-4 col-12 d-flex justify-content-center">
+                    <mat-spinner></mat-spinner>
+                </div>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>

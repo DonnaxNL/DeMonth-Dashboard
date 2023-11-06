@@ -1,0 +1,83 @@
+<mat-drawer-container class="example-container" autosize [hasBackdrop]="isMobile">
+    <mat-drawer #drawer mode="over" [opened]="!isMobile">
+        <h2 class="sidenav-header">Products</h2>
+        <div class="row sidenav-header">
+            <h5 class="col p-0">Menstrual Products</h5>
+            <!-- <button class="col-auto p-0" mat-icon-button>
+                <mat-icon matTooltip="Add new menstrual product type">add_circle_outline</mat-icon>
+            </button> -->
+        </div>
+        <mat-divider></mat-divider>
+        <mat-nav-list>
+            <div *ngFor="let item of menstrualProducts; let i = index">
+                <mat-list-item (click)="changePage('menstrual', item.id, i); isMobile ? drawer.toggle() : null" [class.active]="menuSelected=='item.id'">
+                    <p matLine>{{item.name.en}}</p>
+                </mat-list-item>
+            </div>
+        </mat-nav-list>
+        <div class="row sidenav-header">
+            <h5 class="col p-0">Care Products</h5>
+            <!-- <button class="col-auto p-0" mat-icon-button>
+                <mat-icon matTooltip="Add new menstrual product type">add</mat-icon>
+            </button> -->
+        </div>
+        <mat-divider></mat-divider>
+        <mat-nav-list>
+            <div *ngFor="let item of careProducts; let i = index">
+                <mat-list-item (click)="changePage('care', item.id, i); isMobile ? drawer.toggle() : null" [class.active]="menuSelected=='item.id'">
+                    <p matLine>{{item.name.en}}</p>
+                </mat-list-item>
+            </div>
+        </mat-nav-list>
+        <div class="row sidenav-header">
+            <h5 class="col p-0">Snacks</h5>
+            <!-- <button class="col-auto p-0" mat-icon-button>
+                <mat-icon matTooltip="Add new menstrual product type">add</mat-icon>
+            </button> -->
+        </div>
+        <mat-divider></mat-divider>
+        <mat-nav-list>
+            <div *ngFor="let item of snacks; let i = index">
+                <mat-list-item (click)="changePage('snacks', item.id, i); isMobile ? drawer.toggle() : null" [class.active]="menuSelected=='item.id'">
+                    <p matLine>{{item.name.en}}</p>
+                </mat-list-item>
+            </div>
+        </mat-nav-list>
+    </mat-drawer>
+
+    <div class="container main">
+        <div class="row" *ngIf="isMobile">
+            <div class="col-8">
+                <p class="pt-3 pb-3 link" (click)="drawer.toggle()">
+                    <i class="mr-2 fas fa-chevron-left"></i>
+                    <span class="link-text">Open menu</span>
+                </p>
+            </div>
+            <div class="pt-2 col-4 d-flex justify-content-end">
+
+            </div>
+        </div>
+        <h3 class="header-spacing mb-3">{{selectedPage?.name.en}}</h3>
+        <div *ngIf="selectedData">
+            <div *ngFor="let item of selectedData; let i = index">
+                <div class="mt-4">
+                    <h5>{{item.name}}</h5>
+                    <mat-divider></mat-divider>
+                    <div *ngFor="let product of item.products; let i = index">
+                        <div class="row">
+                            <h6 class="col-10 pt-2">
+                                <span *ngIf="product.name.en">{{product.name.en}}</span>
+                                <span *ngIf="!product.name.en">{{product.name.nl}}</span>
+                            </h6>
+                            <div class="col-2">
+                                <button mat-icon-button (click)="editProduct(selectedPage.id, item.id, product)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</mat-drawer-container>

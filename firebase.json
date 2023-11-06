@@ -1,0 +1,17 @@
+{
+  "hosting": {
+    "site": "dashboard-demonth",
+    "public": "dist/DeMonth-Dashboard",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

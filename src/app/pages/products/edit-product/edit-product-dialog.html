@@ -1,0 +1,62 @@
+<!-- Default dialog -->
+<h2 *ngIf="!savingState" mat-dialog-title>
+    Edit Product
+</h2>
+<div *ngIf="!savingState" mat-dialog-content>
+    <mat-tab-group>
+        <mat-tab label="Nederlands"> 
+            <div class="row pt-2 m-0">
+                <mat-form-field appearance="outline" *ngIf="newProduct?.name" class="col-12 p-0">
+                    <mat-label>Naam</mat-label>
+                    <input matInput [(ngModel)]="newProduct?.name.nl" placeholder="">
+                    <mat-error>Please enter a name.</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline" *ngIf="newProduct?.description" class="col-12 p-0">
+                    <mat-label>Beschrijving</mat-label>
+                    <textarea matInput [(ngModel)]="newProduct?.description.nl" placeholder=""></textarea>
+                    <mat-error>Please enter a name.</mat-error>
+                </mat-form-field>
+            </div>
+        </mat-tab>
+        <mat-tab label="English"> 
+            <div class="row pt-2 m-0">
+                <mat-form-field appearance="outline" *ngIf="newProduct?.name" class="col-12 p-0">
+                    <mat-label>Name</mat-label>
+                    <input matInput [(ngModel)]="newProduct?.name.en" placeholder="">
+                    <mat-error>Please enter a name.</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline" *ngIf="newProduct?.description" class="col-12 p-0">
+                    <mat-label>Description</mat-label>
+                    <textarea matInput [(ngModel)]="newProduct?.description.en" placeholder=""></textarea>
+                    <mat-error>Please enter a name.</mat-error>
+                </mat-form-field>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+    <div class="row pl-1 pr-1">
+        <mat-form-field appearance="outline" class="col-12 col-md-9">
+            <mat-label>Image URL</mat-label>
+            <input matInput [(ngModel)]="newProduct.image" placeholder="">
+        </mat-form-field>
+        <img *ngIf="newProduct.image" class="col-12 col-md-3 p-0" src="{{newProduct.image}}" style="max-height: 64px;">
+    </div>
+</div>
+<!-- Saving state -->
+<h2 *ngIf="savingState && !loadingDone" mat-dialog-title>Saving changes...</h2>
+<div *ngIf="savingState && !loadingDone" mat-dialog-content>
+    <div class="col-12 d-flex justify-content-center">
+        <mat-spinner></mat-spinner>
+    </div>
+    <p class="col-12 d-flex justify-content-center">Please wait...</p>
+</div>
+<!-- Saved state -->
+<h2 *ngIf="loadingDone" mat-dialog-title>Changes saved!</h2>
+<div *ngIf="loadingDone" mat-dialog-content>
+    
+</div>
+<!-- Actions -->
+<div mat-dialog-actions style="justify-content: flex-end;">
+    <button mat-button *ngIf="!loadingDone" (click)="onCloseClick()" [disabled]="savingState">Cancel</button>
+    <button mat-raised-button  color="primary" *ngIf="!savingState" (click)="changeProduct()">Save</button>
+    <button mat-button *ngIf="loadingDone" [mat-dialog-close]="dialogData">Close</button>
+</div>

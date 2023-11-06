@@ -1,0 +1,38 @@
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.navbar-custom { 
+  background-color: #F8BEB8; 
+} 
+
+.button {
+  color: black;
+  font-size: medium;
+  padding: 10px;
+}
+
+.button:hover {
+  color: black;
+}
+
+.navbar-toggler {
+  border-width: 1px;
+  border-color: white;
+  background-color: transparent;
+}
+
+.navbar-toggler:hover {
+  border-width: 1px;
+  border-color: white;
+  background-color: transparent;
+}
+
+.navbar-toggler:focus,
+.navbar-toggler:active {
+  outline: none;
+  box-shadow: none;
+  border-width: 1px;
+  border-color: white;
+  background-color: transparent;
+}

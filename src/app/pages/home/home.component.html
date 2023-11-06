@@ -1,0 +1,306 @@
+<div class="container" style="padding-top: 2rem">
+    <h2>Overview</h2>
+    <hr>
+    <!-- <h4>Notifications</h4>
+    <p>Coming soon</p> -->
+    <div class="row mt-3 mb-3" [@animate]="{ value: '*', params: { x: '-50px' } }">
+        <div class="col-12 col-md-8 mb-3">
+            <div class="row" style="vertical-align: bottom; height: 35px">
+                <div class="col-7 d-flex justify-content-start">
+                    <h4>Deliveries</h4>
+                </div>
+                <div class="col-5 d-flex justify-content-end">
+                    <p class="link align-self-center" (click)="allDeliveries()">
+                        <span class="link-text">All deliveries</span>
+                        <i class="ml-2 fas fa-chevron-right"></i>
+                    </p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="infoblock side-smaller-padding">
+                    <div *ngIf="dataLoaded">
+                        <div *ngIf="!showDetails">
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-start">
+                                    <h5 *ngIf="currentWeek > -1">
+                                        Week {{currentWeek}}
+                                        <span *ngIf="weekDates">
+                                            ({{weekDates[0] | date:'MMMM d'}} - {{weekDates[6] | date:'MMMM d'}})
+                                        </span>
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="chart" style="height: 200px;">
+                                <canvas baseChart [datasets]="deliveriesChartData" [labels]="deliveriesChartLabels"
+                                    [options]="deliveriesChartOptions" [chartType]="deliveriesChartType"
+                                    (chartClick)="chartClicked($event)"></canvas>
+                            </div>
+                        </div>
+                        <div *ngIf="showDetails" [@animate]="{ value: '*', params: { x: '-100px' } }">
+                            <div class="row">
+                                <div class="col-6 d-flex justify-content-start">
+                                    <p class="link align-self-center" (click)="showDetails = false">
+                                        <i class="mr-2 fas fa-chevron-left"></i>
+                                        <span class="link-text">Back</span>
+                                    </p>
+                                </div>
+                                <div class="col-6 d-flex justify-content-end">
+                                    <h5>{{weekDates[selectedDayIndex] | date:'d MMMM'}}</h5>
+                                </div>
+                            </div>
+                            <div *ngFor="let item of selectedDay; let i = index" class="row"
+                                style="padding-left: 10px; padding-right: 10px;">
+                                <p class="col-12 col-md-6 order-md-2 pt-2">{{item.customer}}</p>
+                                <p class="col-8 col-md-3 order-md-1 pt-2">{{item.orderRef}}</p>
+                                <!-- <h6 class="col-4 col-md-2 order-md-3 pt-2 d-flex justify-content-end">
+                                    {{item.deliveryItem.deliveryDate.toDate().setDate(item.deliveryItem.deliveryDate.toDate().getDate() - 1) | date:'dd-MM-yy'}}
+                                </h6> -->
+                                <button mat-button class="col-4 col-md-3 order-md-4" (click)="viewDelivery(item)">
+                                    View details
+                                </button>
+                                <hr *ngIf="i != (selectedDay.length-1)" class="col-11 order-md-5"
+                                    style="margin-top: 0em; margin-bottom: 0em;">
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="!dataLoaded">
+                        <div class="row">
+                            <div class="col-12">
+                                <ngx-skeleton-loader class="w-100" [theme]="{ width: '200px', height: '30px'}">
+                                </ngx-skeleton-loader>
+                            </div>
+                            <div class="col-12">
+                                <ngx-skeleton-loader class="w-100" [theme]="{ height: '200px'}"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                        <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="row" style="vertical-align: center; height: 35px">
+                <div class="col-5 d-flex justify-content-start">
+                    <h4>Administration</h4>
+                </div>
+                <div class="col-7 d-flex justify-content-end">
+                    <p class="link align-self-center" (click)="viewInsights()">
+                        <span class="link-text">View more</span>
+                        <i class="ml-2 fas fa-chevron-right"></i>
+                    </p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="infoblock info-side-padding">
+                    <div *ngIf="dataLoaded">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="text-center">Chosen box</h5>
+                            </div>
+                        </div>
+                        <div class="chart" style="height: 200px;">
+                            <canvas baseChart [data]="boxChartData" [labels]="boxChartLabels"
+                                [options]="boxChartOptions" [chartType]="boxChartType"
+                                [colors]="boxChartColors"></canvas>
+                        </div>
+                    </div>
+                    <div *ngIf="!dataLoaded">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <ngx-skeleton-loader class="w-100" [theme]="{ width: '100px', height: '30px'}">
+                                </ngx-skeleton-loader>
+                            </div>
+                            <div class="col-12">
+                                <ngx-skeleton-loader class="w-100" [theme]="{ height: '200px'}"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3" [@animate]="{ value: '*', params: { x: '-50px' } }">
+        <div class="col-md-6 mb-3">
+            <div>
+                <div class="row" style="vertical-align: center; height: 35px">
+                    <div class="col-5 d-flex justify-content-start">
+                        <h4>Latest orders</h4>
+                    </div>
+                    <div class="col-7 d-flex justify-content-end">
+                        <p class="link align-self-center" (click)="allOrders()">
+                            <span class="link-text">All subscriptions</span>
+                            <i class="ml-2 fas fa-chevron-right"></i>
+                        </p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="infoblock side-smaller-padding">
+                        <div *ngIf="dataLoaded">
+                            <div *ngFor="let item of latestOrders; let i = index">
+                                <div class="row order-row" (click)="viewOrder(item)">
+                                    <p class="col-7">
+                                        {{item.boxName}}
+                                        <span
+                                            *ngIf="item.fullOrder.paymentPlan == 0 && item.fullOrder.checkoutSummary.points">
+                                            (DMP claim)
+                                        </span>
+                                        <span
+                                            *ngIf="item.fullOrder.paymentPlan == 0 && !item.fullOrder.checkoutSummary.points && item.fullOrder.boxId != 'box_13'">
+                                            (Free referral box)
+                                        </span>
+                                        <span *ngIf="item.fullOrder.paymentPlan == 1">subscription</span>
+                                        <span *ngIf="item.fullOrder.paymentPlan > 1">
+                                            ({{item.fullOrder.paymentPlan}} month plan)
+                                        </span>
+                                    </p>
+                                    <p class="col-5 d-flex justify-content-end">
+                                        {{item.orderCreated | date:'dd-MM-yyyy'}}
+                                    </p>
+                                </div>
+                                <mat-divider *ngIf="i != (latestOrders.length-1)"></mat-divider>
+                            </div>
+                        </div>
+                        <div *ngIf="!dataLoaded">
+                            <div class="col-12 d-flex pt-2 justify-content-center">
+                                <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
+                                <ngx-skeleton-loader class="w-100" count="5"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div [hidden]="!userRole[4]">
+                <div class="row mt-3" style="vertical-align: center; height: 35px">
+                    <div class="col-12 justify-content-start">
+                        <h4>More actions</h4>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="infoblock side-smaller-padding">
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <button mat-button routerLink="/customers">
+                                    Customers
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <button mat-button routerLink="/coupons">
+                                    Coupons
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <button mat-button routerLink="/products">
+                                    Products
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-6" [hidden]="!userRole[4]">
+                                <button mat-button routerLink="/care-rotation">
+                                    Care Product Rotation
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-6" [hidden]="!userRole[4]">
+                                <button mat-button (click)="allPayments()">
+                                    Payments
+                                    <mat-icon>launch</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3" [hidden]="!userRole[4]">
+            <div class="row" style="vertical-align: center; height: 35px">
+                <div class="col-5 d-flex justify-content-start">
+                    <h4>Inventory</h4>
+                </div>
+                <div class="col-7 d-flex justify-content-end">
+                    <p class="link align-self-center" routerLink="/inventory">
+                        <span class="link-text">Full Inventory</span>
+                        <i class="ml-2 fas fa-chevron-right"></i>
+                    </p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="infoblock side-smaller-padding">
+                    <div *ngIf="dataLoaded && productNoticeList.length > 0">
+                        <h6 class="ml-1">Attention needed!</h6>
+                        <div *ngFor="let item of productNoticeList; let i = index">
+                            <div class="row order-row">
+                                <p class="col-10">
+                                    <span *ngIf="item.type">
+                                        {{item.type}} -
+                                    </span>
+                                    <span *ngIf="item.name.nl">
+                                        {{item.name.nl}}
+                                    </span>
+                                    <span *ngIf="!item.name.nl">
+                                        {{item.name}}
+                                    </span>
+                                </p>
+                                <p class="col-2 d-flex justify-content-end">
+                                    {{item.amount}}
+                                </p>
+                            </div>
+                            <mat-divider *ngIf="i != (productNoticeList.length-1)"></mat-divider>
+                        </div>
+                        <div class="col-12 d-flex justify-content-center">
+                            <button mat-button (click)="inventoryNotice()">
+                                <span *ngIf="!showAllNotice">Show more</span>
+                                <span *ngIf="showAllNotice">Show less</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div *ngIf="dataLoaded && productNoticeList.length == 0">
+                        <p>View the full inventory.</p>
+                    </div>
+                    <div *ngIf="!dataLoaded">
+                        <div class="col-12 d-flex pt-2 justify-content-center">
+                            <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
+                            <ngx-skeleton-loader class="w-100" count="5"></ngx-skeleton-loader>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3" [hidden]="userRole[4]">
+            <div class="row" style="vertical-align: center; height: 35px">
+                <div class="col-12 justify-content-start">
+                    <h4>More actions</h4>
+                </div>
+            </div>
+            <div class="card">
+                <div class="infoblock side-smaller-padding">
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <button mat-button routerLink="/customers">
+                                Customers
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <button mat-button routerLink="/coupons">
+                                Coupons
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <button mat-button routerLink="/products">
+                                Products
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-6" [hidden]="!userRole[4]">
+                            <button mat-button routerLink="/care-rotation">
+                                Care Product Rotation
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-6" [hidden]="!userRole[4]">
+                            <button mat-button (click)="allPayments()">
+                                Payments
+                                <mat-icon>launch</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

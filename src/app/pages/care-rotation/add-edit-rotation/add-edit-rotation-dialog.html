@@ -1,0 +1,227 @@
+<!-- Default dialog -->
+<h3 *ngIf="!savingState" mat-dialog-title>
+    <span *ngIf="dialogData.item">Edit </span>
+    <span *ngIf="!dialogData.item">Add</span>
+    - {{months[dialogData.selectedMonth]}} {{dialogData.selectedYear}}
+</h3>
+<div *ngIf="!savingState" mat-dialog-content>
+    <mat-tab-group mat-align-tabs="center" dynamicHeight>
+        <mat-tab label="Normal">
+            <div class="row mt-2 p-0 ml-0 mr-0">
+                <div class="col-12">
+                    <h6><b>Face Mask</b></h6>
+                    <mat-form-field *ngIf="allFaceMasks && selectedProducts" appearance="outline" class="full-width">
+                        <mat-select [(ngModel)]="selectedProducts?.facemask.normal" placeholder="Select a Face Mask">
+                            <mat-optgroup [label]="allFaceMasks[0]?.brand">
+                                <mat-option *ngFor="let product of allFaceMasks[0]?.products" [value]="product.id">
+                                    {{product.name.nl}}
+                                </mat-option>
+                            </mat-optgroup>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <h6><b>ShampooBar</b></h6>
+                    <mat-form-field *ngIf="allShampooBars && selectedProducts" appearance="outline" class="full-width">
+                        <mat-select [(ngModel)]="selectedProducts?.shampoobar.normal" placeholder="Select a ShampooBar">
+                            <mat-option *ngFor="let bar of allShampooBars" [value]="bar.id">
+                                {{bar.name.en}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <h6><b>Tea</b></h6>
+                    <div class="row p-0" *ngIf="allTeas && selectedProducts">
+                        <mat-form-field appearance="outline" class="col-12 col-md-6 full-width">
+                            <mat-select [(ngModel)]="selectedProducts?.tea.normal[0]"
+                                placeholder="Select a tea flavour">
+                                <mat-optgroup [label]="allTeas[0]?.brand">
+                                    <mat-option *ngFor="let product of allTeas[0]?.products" [value]="product.id">
+                                        {{product.name.nl}}
+                                    </mat-option>
+                                </mat-optgroup>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="col-12 col-md-6 full-width">
+                            <mat-select [(ngModel)]="selectedProducts?.tea.normal[1]"
+                                placeholder="Select a tea flavour">
+                                <mat-optgroup [label]="allTeas[0]?.brand">
+                                    <mat-option *ngFor="let product of allTeas[0]?.products" [value]="product.id">
+                                        {{product.name.nl}}
+                                    </mat-option>
+                                </mat-optgroup>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Mixed">
+            <div class="row mt-2 p-0 ml-0 mr-0">
+                <div class="col-12">
+                    <h6><b>Face Mask</b></h6>
+                    <mat-form-field *ngIf="allFaceMasks && selectedProducts" appearance="outline" class="full-width">
+                        <mat-select [(ngModel)]="selectedProducts?.facemask.mixed" placeholder="Select a Face Mask">
+                            <mat-optgroup [label]="allFaceMasks[1]?.brand">
+                                <mat-option *ngFor="let product of allFaceMasks[1]?.products" [value]="product.id">
+                                    {{product.name.nl}}
+                                </mat-option>
+                            </mat-optgroup>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <h6><b>ShampooBar</b></h6>
+                    <mat-form-field *ngIf="allShampooBars && selectedProducts" appearance="outline" class="full-width">
+                        <mat-select [(ngModel)]="selectedProducts?.shampoobar.mixed" placeholder="Select a ShampooBar">
+                            <mat-option *ngFor="let bar of allShampooBars" [value]="bar.id">
+                                {{bar.name.en}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <h6><b>Tea</b></h6>
+                    <div class="row p-0" *ngIf="allTeas && selectedProducts">
+                        <mat-form-field appearance="outline" class="col-12 col-md-6 full-width">
+                            <mat-select [(ngModel)]="selectedProducts?.tea.mixed[0]" placeholder="Select a tea flavour">
+                                <mat-optgroup [label]="allTeas[0]?.brand">
+                                    <mat-option *ngFor="let product of allTeas[0]?.products" [value]="product.id">
+                                        {{product.name.nl}}
+                                    </mat-option>
+                                </mat-optgroup>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="col-12 col-md-6 full-width">
+                            <mat-select [(ngModel)]="selectedProducts?.tea.mixed[1]" placeholder="Select a tea flavour">
+                                <mat-optgroup [label]="allTeas[0]?.brand">
+                                    <mat-option *ngFor="let product of allTeas[0]?.products" [value]="product.id">
+                                        {{product.name.nl}}
+                                    </mat-option>
+                                </mat-optgroup>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Dry">
+            <div class="row mt-2 p-0 ml-0 mr-0">
+                <div class="col-12">
+                    <h6><b>Face Mask</b></h6>
+                    <mat-form-field *ngIf="allFaceMasks && selectedProducts" appearance="outline" class="full-width">
+                        <mat-select [(ngModel)]="selectedProducts?.facemask.dry" placeholder="Select a Face Mask">
+                            <mat-optgroup [label]="allFaceMasks[2]?.brand">
+                                <mat-option *ngFor="let product of allFaceMasks[2]?.products" [value]="product.id">
+                                    {{product.name.nl}}
+                                </mat-option>
+                            </mat-optgroup>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <h6><b>ShampooBar</b></h6>
+                    <mat-form-field *ngIf="allShampooBars && selectedProducts" appearance="outline" class="full-width">
+                        <mat-select [(ngModel)]="selectedProducts?.shampoobar.dry" placeholder="Select a ShampooBar">
+                            <mat-option *ngFor="let bar of allShampooBars" [value]="bar.id">
+                                {{bar.name.en}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <h6><b>Tea</b></h6>
+                    <div class="row p-0" *ngIf="allTeas && selectedProducts">
+                        <mat-form-field appearance="outline" class="col-12 col-md-6 full-width">
+                            <mat-select [(ngModel)]="selectedProducts?.tea.dry[0]" placeholder="Select a tea flavour">
+                                <mat-optgroup [label]="allTeas[0]?.brand">
+                                    <mat-option *ngFor="let product of allTeas[0]?.products" [value]="product.id">
+                                        {{product.name.nl}}
+                                    </mat-option>
+                                </mat-optgroup>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="col-12 col-md-6 full-width">
+                            <mat-select [(ngModel)]="selectedProducts?.tea.dry[1]" placeholder="Select a tea flavour">
+                                <mat-optgroup [label]="allTeas[0]?.brand">
+                                    <mat-option *ngFor="let product of allTeas[0]?.products" [value]="product.id">
+                                        {{product.name.nl}}
+                                    </mat-option>
+                                </mat-optgroup>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Oily">
+            <div class="row mt-2 p-0 ml-0 mr-0">
+                <div class="col-12">
+                    <h6><b>Face Mask</b></h6>
+                    <mat-form-field *ngIf="allFaceMasks && selectedProducts" appearance="outline" class="full-width">
+                        <mat-select [(ngModel)]="selectedProducts?.facemask.oil" placeholder="Select a Face Mask">
+                            <mat-optgroup [label]="allFaceMasks[3]?.brand">
+                                <mat-option *ngFor="let product of allFaceMasks[3]?.products" [value]="product.id">
+                                    {{product.name.nl}}
+                                </mat-option>
+                            </mat-optgroup>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <h6><b>ShampooBar</b></h6>
+                    <mat-form-field *ngIf="allShampooBars && selectedProducts" appearance="outline" class="full-width">
+                        <mat-select [(ngModel)]="selectedProducts?.shampoobar.oil" placeholder="Select a ShampooBar">
+                            <mat-option *ngFor="let bar of allShampooBars" [value]="bar.id">
+                                {{bar.name.en}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <h6><b>Tea</b></h6>
+                    <div class="row p-0" *ngIf="allTeas && selectedProducts">
+                        <mat-form-field appearance="outline" class="col-12 col-md-6 full-width">
+                            <mat-select [(ngModel)]="selectedProducts?.tea.oil[0]" placeholder="Select a tea flavour">
+                                <mat-optgroup [label]="allTeas[0]?.brand">
+                                    <mat-option *ngFor="let product of allTeas[0]?.products" [value]="product.id">
+                                        {{product.name.nl}}
+                                    </mat-option>
+                                </mat-optgroup>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="col-12 col-md-6 full-width">
+                            <mat-select [(ngModel)]="selectedProducts?.tea.oil[1]" placeholder="Select a tea flavour">
+                                <mat-optgroup [label]="allTeas[0]?.brand">
+                                    <mat-option *ngFor="let product of allTeas[0]?.products" [value]="product.id">
+                                        {{product.name.nl}}
+                                    </mat-option>
+                                </mat-optgroup>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>
+<!-- Saving state -->
+<h2 *ngIf="savingState && !loadingDone" mat-dialog-title>Saving changes...</h2>
+<div *ngIf="savingState && !loadingDone" mat-dialog-content>
+    <div class="col-12 d-flex justify-content-center">
+        <mat-spinner></mat-spinner>
+    </div>
+    <p class="col-12 d-flex justify-content-center">Please wait...</p>
+</div>
+<!-- Saved state -->
+<h2 *ngIf="loadingDone" mat-dialog-title>Changes saved!</h2>
+<div *ngIf="loadingDone" mat-dialog-content>
+
+</div>
+<!-- Actions -->
+<div mat-dialog-actions style="justify-content: flex-end;">
+    <button mat-button *ngIf="!loadingDone" (click)="onCloseClick()" [disabled]="savingState">Cancel</button>
+    <button mat-raised-button color="primary" *ngIf="!savingState" (click)="changeProduct()">Save</button>
+    <button mat-button *ngIf="loadingDone" [mat-dialog-close]="dialogData">Close</button>
+</div>

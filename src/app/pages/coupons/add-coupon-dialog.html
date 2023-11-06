@@ -1,0 +1,62 @@
+<h2 mat-dialog-title>
+    <span *ngIf="!data.isEdit">Add new coupon</span>
+    <span *ngIf="data.isEdit">Edit coupon</span>
+</h2>
+<div mat-dialog-content>
+    <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>Code</mat-label>
+        <input matInput [(ngModel)]="data.coupon.id" required 
+            [disabled]="data.coupon.type == 'special' && data.coupon.usedBy.length > 0 ||
+            data.coupon.type == 'single' && data.coupon.used">
+        <button mat-button style="vertical-align: middle;" matSuffix (click)="generateCode()" 
+            [disabled]="data.coupon.type == 'special' && data.coupon.usedBy.length > 0 ||
+            data.coupon.type == 'single' && data.coupon.used">
+            Generate
+        </button>
+        <mat-error *ngIf="errorCode">Code required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" hintLabel="Short description, visible to customers" style="width: 100%">
+        <mat-label>Description</mat-label>
+        <input matInput #input maxlength="25" [(ngModel)]="data.coupon.name" required>
+        <mat-hint align="end">{{input.value?.length || 0}}/25</mat-hint>
+        <mat-error *ngIf="errorDescription">Description required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="margin-top: 5px; width: 100%">
+        <mat-label>Discount</mat-label>
+        <input matInput type="number" min="1" max="100" placeholder="Discount in percentage"
+            [(ngModel)]="data.coupon.discount" required>
+        <span matSuffix>%</span>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="margin-top: 5px; width: 100%">
+        <mat-label>Expire Date</mat-label>
+        <input matInput [matDatepicker]="picker" [min]="minDate"
+            [(ngModel)]="data.coupon.expireDate" (click)="picker.open()">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-radio-group aria-label="Select an option" [(ngModel)]="data.coupon.type"
+        [disabled]="data.coupon.type == 'special' && data.coupon.usedBy.length > 0 ||
+            data.coupon.type == 'single' && data.coupon.used">
+        <mat-radio-button style="margin-right: 16px" value="special">Special (multiple use)</mat-radio-button>
+        <mat-radio-button value="single">Single use</mat-radio-button>
+    </mat-radio-group>
+
+    <div *ngIf="data.coupon.type == 'special'">
+        <mat-form-field appearance="outline" style="width: 100%">
+            <mat-label>Limit</mat-label>
+            <input matInput type="number" [min]="data.coupon.usedBy.length" placeholder="Limit" [(ngModel)]="data.coupon.limit">
+            <mat-hint>Leave 0 if you don't want a limit.</mat-hint>
+        </mat-form-field>
+    </div>
+</div>
+<div mat-dialog-actions style="justify-content: flex-end;">
+    <button mat-button (click)="onNoClick()">Cancel</button>
+    <button mat-button (click)="addCoupon()" cdkFocusInitial>
+        <span *ngIf="!data.isEdit">Add coupon</span>
+        <span *ngIf="data.isEdit">Save coupon</span>
+    </button>
+</div>

@@ -1,0 +1,51 @@
+@import "~@angular/material/theming";
+
+.block {
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+}
+
+.block-active {
+    @include mat-elevation(2);
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+}
+
+.infoblock {
+    padding: 10px;
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.button {
+    display: table-cell;
+    width: 100%;
+}
+
+.button-active {
+    display: table-cell;
+    width: 100%;
+    color: #faada4;
+}
+
+.full-width {
+    width: 100%;
+}
+
+::ng-deep .mat-tab-label {
+    min-width: 50px !important;
+    padding: 6px;
+    font-weight: 500;
+}
+
+::ng-deep .mat-tab-label-active {
+    background-color: transparent;
+    color: #faada4;
+}
+
+@media (max-width: 480px) {
+    ::ng-deep .mat-tab-label {
+        max-width: 80px !important;
+    }
+}

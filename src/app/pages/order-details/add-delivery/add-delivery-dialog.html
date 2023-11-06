@@ -1,0 +1,26 @@
+<!-- Default dialog -->
+<h2 *ngIf="!savingState" mat-dialog-title>New delivery item</h2>
+<div *ngIf="!savingState" mat-dialog-content>
+    <mat-form-field class="col-12 mt-2 d-flex justify-content-center">
+        <input matInput [matDatepicker]="picker"
+            [(ngModel)]="datePicker" placeholder="Select delivery date"
+            (dateChange)="datePickerEvent('change', $event)">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error>Please select a delivery date.</mat-error>
+    </mat-form-field>
+</div>
+<!-- Saving state -->
+<h2 *ngIf="savingState && !loadingDone" mat-dialog-title>Saving changes...</h2>
+<div *ngIf="savingState && !loadingDone" mat-dialog-content>
+    <div class="col-12 d-flex justify-content-center">
+        <mat-spinner></mat-spinner>
+    </div>
+    <p class="col-12 d-flex justify-content-center">Please wait...</p>
+</div>
+<!-- Actions -->
+<div mat-dialog-actions style="justify-content: flex-end;">
+    <button mat-button *ngIf="!loadingDone" (click)="onNoClick()" [disabled]="savingState">Cancel</button>
+    <button mat-raised-button color="primary" *ngIf="!savingState" (click)="add()">Add</button>
+    <button mat-button *ngIf="loadingDone" [mat-dialog-close]="dialogData">Close</button>
+</div>

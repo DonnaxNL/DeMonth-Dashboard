@@ -1,0 +1,48 @@
+<div class="container" style="padding-top: 2rem">
+    <h2>All customers ({{customers?.length}})</h2>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <mat-form-field>
+                    <mat-label>Filter</mat-label>
+                    <input matInput (keyup)="applyFilter($event)" placeholder="Search by name, email or CustomerID">
+                </mat-form-field>
+            </div>
+            <!-- <div class="col-6 d-flex justify-content-end" *ngIf="userRole[4]">
+                <button mat-button (click)="exportToExcel()">Download Excel</button>
+            </div> -->
+        </div>
+
+        <mat-table [dataSource]="dataSource" matSort class="block">
+
+            <!-- id Column
+            <ng-container matColumnDef="customerId">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Id </mat-header-cell>
+                <mat-cell *matCellDef="let customer" data-label="customerId"> {{customer.customerId}} </mat-cell>
+            </ng-container> -->
+
+            <!-- first Column -->
+            <ng-container matColumnDef="firstName">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> First name </mat-header-cell>
+                <mat-cell *matCellDef="let customer" data-label="firstName"> {{customer.firstName | titlecase}} </mat-cell>
+            </ng-container>
+
+            <!-- last Column -->
+            <ng-container matColumnDef="lastName">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Last name </mat-header-cell>
+                <mat-cell *matCellDef="let customer" data-label="lastName"> {{customer.lastName | titlecase}} </mat-cell>
+            </ng-container>
+
+            <!-- email Column -->
+            <ng-container matColumnDef="email">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
+                <mat-cell *matCellDef="let customer" data-label="email"> {{customer.email}} </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showDetails(row)"></mat-row>
+        </mat-table>
+
+        <mat-paginator #activePaginator [pageSizeOptions]="[25, 50, 100]" showFirstLastButtons></mat-paginator>
+    </div>
+</div>

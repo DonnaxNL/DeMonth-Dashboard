@@ -1,0 +1,110 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12" *ngIf="!isMobile" style="padding-top: 2rem"></div>
+        <div class="col-md my-auto" *ngIf="!isMobile">
+            <h2 class="my-auto">Statistics</h2>
+        </div>
+        <div class="col-12 col-md-auto p-2 d-flex my-auto justify-content-center">
+            <mat-button-toggle-group [(ngModel)]="statsRange" (ngModelChange)="onRangeChanged()">
+                <!-- <mat-button-toggle value="days">Days</mat-button-toggle> -->
+                <mat-button-toggle value="weeks">Weeks</mat-button-toggle>
+                <mat-button-toggle value="months">Months</mat-button-toggle>
+                <!-- <mat-button-toggle value="years">Years</mat-button-toggle> -->
+                <mat-button-toggle value="custom">Range</mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 d-flex my-auto mx-auto justify-content-center">
+            <div class="mb-4" *ngIf="statsRange == 'weeks'">
+                <div class="infoblock">
+                    <div class="row">
+                        <div class="col-auto">
+                            <h5 class="pt-2 pl-2">Week {{currentWeek}}</h5>
+                        </div>
+                        <div class="col d-flex justify-content-end" *ngIf="isMobile">
+                            <button mat-icon-button (click)="showSelector = !showSelector">
+                                <i class="fas fa-chevron-down" *ngIf="!showSelector"></i>
+                                <i class="fas fa-chevron-up" *ngIf="showSelector"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row" [hidden]="!showSelector">
+                        <div class="col-12 d-flex justify-content-center">
+                            <div class="row m-1">
+                                <div *ngFor="let weekNo of weekRange; let i = index" class="col-6 col-md-auto p-1">
+                                    <button mat-stroked-button [ngClass]="currentWeek == weekNo ? 'select-button-active':'select-button'" (click)="changeWeek(weekNo)">
+                                        Week {{weekNo}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4" *ngIf="statsRange == 'months'">
+                <div class="infoblock">
+                    <div class="row">
+                        <div class="col-auto">
+                            <h5 class="pt-2 pl-2">{{today | date:'yyyy'}}</h5>
+                        </div>
+                        <div class="col d-flex justify-content-end" *ngIf="isMobile">
+                            <button mat-icon-button (click)="showSelector = !showSelector">
+                                <i class="fas fa-chevron-down" *ngIf="!showSelector"></i>
+                                <i class="fas fa-chevron-up" *ngIf="showSelector"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row" [hidden]="!showSelector">
+                        <div class="col-12 d-flex justify-content-center">
+                            <div class="row m-1">
+                                <div *ngFor="let month of months; let i = index" class="col-6 col-md-auto p-1">
+                                    <button mat-stroked-button [ngClass]="selectedMonth == i ? 'select-button-active':'select-button'" (click)="changeDate(i)" [disabled]="i > today.getMonth()">
+                                        {{month}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4" *ngIf="statsRange == 'custom'">
+                <button mat-stroked-button (click)="pickerStart.open()">{{startDate | date:'dd-MM-yyyy'}}</button>
+                <mat-form-field style="width:0px;height:0px;visibility:hidden;">
+                    <input matInput [matDatepicker]="pickerStart" [min]="minDate" [(ngModel)]="startDate"
+                        (ngModelChange)="onDateChanged()">
+                    <mat-datepicker #pickerStart></mat-datepicker>
+                </mat-form-field>
+                <i class="my-auto ml-2 mr-2 fas fa-arrow-right"></i>
+                <button mat-stroked-button (click)="pickerEnd.open()">{{endDate | date:'dd-MM-yyyy'}}</button>
+                <mat-form-field style="width:0px;height:0px;visibility:hidden;">
+                    <input matInput [matDatepicker]="pickerEnd" [min]="startDate" [(ngModel)]="endDate"
+                        (ngModelChange)="onDateChanged()">
+                    <mat-datepicker #pickerEnd></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="infoblock side-smaller-padding">
+                    <div *ngIf="orders.length != 0">
+                        <div class="chart" style="height: 300px; padding: 10px;" *ngIf="showGraph">
+                            <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels"
+                                [options]="lineChartOptions" [chartType]="lineChartType"
+                                [colors]="lineChartColors"></canvas>
+                        </div>
+                    </div>
+                    <div *ngIf="orders.length == 0">
+                        <div class="row" style="padding: 10px;">
+                            <div class="col-12">
+                                <ngx-skeleton-loader class="w-100" [theme]="{ height: '200px'}">
+                                </ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

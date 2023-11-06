@@ -1,0 +1,202 @@
+<div class="container" style="padding-top: 2rem">
+    <div class="row">
+        <div class="col-12 col-md-9">
+            <h2>Care Products Rotation</h2>
+        </div>
+        <!-- <div class="col-12 col-md-3 d-flex justify-content-end">
+            <button mat-button>Add rotation</button>
+        </div> -->
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 col-lg-4">
+            <div>
+                <!-- <h4 class="pt-2 pb-2"></h4> -->
+                <div class="block mb-2">
+                    <div class="infoblock">
+                        <div class="row">
+                            <div class="col-10">
+                                <h5 class="pt-2 pl-2">Select rotation date</h5>
+                            </div>
+                            <div class="col-2 d-flex justify-content-end" *ngIf="isMobile">
+                                <button mat-icon-button [disabled]="!dataLoaded" (click)="showSelector = !showSelector">
+                                    <i class="fas fa-chevron-down" *ngIf="!showSelector"></i>
+                                    <i class="fas fa-chevron-up" *ngIf="showSelector"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row" [hidden]="!showSelector && isMobile">
+                            <div class="col-12 d-flex justify-content-center">
+                                <mat-form-field style="width: 80px;">
+                                    <mat-select [(ngModel)]="selectedYear" (ngModelChange)="onSelectChanged($event)">
+                                        <mat-option *ngFor="let year of years" [value]="year">
+                                            {{year}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-12 d-flex justify-content-center">
+                                <div class="row m-1">
+                                    <div *ngFor="let month of months; let i = index" class="col-6 p-1">
+                                        <button mat-stroked-button [ngClass]="selectedMonth == i ? 'button-active':'button'" (click)="changeDate(i)">
+                                            {{month}}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8">
+            <h4 class="text-center pt-2 pb-2">{{selectedYear}}</h4>
+            <div *ngFor="let date of months; let i = index">
+                <div class="mb-3" [ngClass]="selectedMonth == i ? 'block-active':'block'" style="padding: 1rem" id="item-{{i}}">
+                    <div class="row">
+                        <div class="col-10 d-flex justify-content-start">
+                            <h4 class="mt-2">{{months[i]}}</h4>
+                        </div>
+                        <div class="col-2 d-flex justify-content-end">
+                            <button mat-icon-button [disabled]="!dataLoaded" (click)="editRotation(rotationData[i], i, rotationData[i])">
+                                <mat-icon *ngIf="rotationData[i]">edit</mat-icon>
+                                <mat-icon *ngIf="!rotationData[i]">add</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <div *ngIf="dataLoaded">
+                        <div *ngIf="rotationData[i]">
+                            <mat-tab-group mat-align-tabs="center" dynamicHeight>
+                                <mat-tab label="Normal">
+                                    <div class="row mt-2 p-0 ml-0 mr-0">
+                                        <div class="col-12 col-md-6 mb-2">
+                                            <h6><b>Face Mask</b></h6>
+                                            <mat-chip-list>
+                                                <mat-chip *ngIf="rotationData[i].products.facemask.normal" color="primary" selected style="color: white">
+                                                    {{rotationData[i].products.facemask.normal.name.nl}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                        <div class="col-12 col-md-6 mb-2"> 
+                                            <h6><b>ShampooBar</b></h6>
+                                            <mat-chip-list>
+                                                <mat-chip *ngIf="rotationData[i].products.shampoobar.normal" color="primary" selected style="color: white">
+                                                    {{rotationData[i].products.shampoobar.normal.name}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                        <div class="col-12 mb-2">
+                                            <h6><b>Tea</b></h6>
+                                            <mat-chip-list *ngIf="rotationData[i].products.tea.normal">
+                                                <mat-chip *ngFor="let item of rotationData[i].products.tea.normal" color="primary" selected style="color: white">
+                                                    {{item.name}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                    </div>
+                                </mat-tab>
+                                <mat-tab label="Mixed">
+                                    <div class="row mt-2 p-0 ml-0 mr-0">
+                                        <div class="col-12 col-md-6 mb-2">
+                                            <h6><b>Face Mask</b></h6>
+                                            <mat-chip-list>
+                                                <mat-chip *ngIf="rotationData[i].products.facemask.mixed" color="primary" selected style="color: white">
+                                                    {{rotationData[i].products.facemask.mixed.name.nl}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                        <div class="col-12 col-md-6 mb-2"> 
+                                            <h6><b>ShampooBar</b></h6>
+                                            <mat-chip-list>
+                                                <mat-chip *ngIf="rotationData[i].products.shampoobar.mixed" color="primary" selected style="color: white">
+                                                    {{rotationData[i].products.shampoobar.mixed.name}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                        <div class="col-12 mb-2">
+                                            <h6><b>Tea</b></h6>
+                                            <mat-chip-list *ngIf="rotationData[i].products.tea.mixed">
+                                                <mat-chip *ngFor="let item of rotationData[i].products.tea.mixed" color="primary" selected style="color: white">
+                                                    {{item.name}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                    </div>
+                                </mat-tab>
+                                <mat-tab label="Dry">
+                                    <div class="row mt-2 p-0 ml-0 mr-0">
+                                        <div class="col-12 col-md-6 mb-2">
+                                            <h6><b>Face Mask</b></h6>
+                                            <mat-chip-list>
+                                                <mat-chip *ngIf="rotationData[i].products.facemask.dry" color="primary" selected style="color: white">
+                                                    {{rotationData[i].products.facemask.dry.name.nl}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                        <div class="col-12 col-md-6 mb-2"> 
+                                            <h6><b>ShampooBar</b></h6>
+                                            <mat-chip-list>
+                                                <mat-chip *ngIf="rotationData[i].products.shampoobar.dry" color="primary" selected style="color: white">
+                                                    {{rotationData[i].products.shampoobar.dry.name}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                        <div class="col-12 mb-2">
+                                            <h6><b>Tea</b></h6>
+                                            <mat-chip-list *ngIf="rotationData[i].products.tea.dry">
+                                                <mat-chip *ngFor="let item of rotationData[i].products.tea.dry" color="primary" selected style="color: white">
+                                                    {{item.name}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                    </div>
+                                </mat-tab>
+                                <mat-tab label="Oily">
+                                    <div class="row mt-2 p-0 ml-0 mr-0">
+                                        <div class="col-12 col-md-6 mb-2">
+                                            <h6><b>Face Mask</b></h6>
+                                            <mat-chip-list>
+                                                <mat-chip *ngIf="rotationData[i].products.facemask.oil" color="primary" selected style="color: white">
+                                                    {{rotationData[i].products.facemask.oil.name.nl}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                        <div class="col-12 col-md-6 mb-2"> 
+                                            <h6><b>ShampooBar</b></h6>
+                                            <mat-chip-list>
+                                                <mat-chip *ngIf="rotationData[i].products.shampoobar.oil" color="primary" selected style="color: white">
+                                                    {{rotationData[i].products.shampoobar.oil.name}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                        <div class="col-12 mb-2">
+                                            <h6><b>Tea</b></h6>
+                                            <mat-chip-list *ngIf="rotationData[i].products.tea.oil">
+                                                <mat-chip *ngFor="let item of rotationData[i].products.tea.oil" color="primary" selected style="color: white">
+                                                    {{item.name}}
+                                                </mat-chip>
+                                            </mat-chip-list>
+                                        </div>
+                                    </div>
+                                </mat-tab>
+                            </mat-tab-group>
+                        </div>
+                        <div *ngIf="!rotationData[i]">
+                            No data.
+                        </div>
+                    </div>
+                    <div *ngIf="!dataLoaded">
+                        <div class="row ml-2 mr-2">
+                            <ngx-skeleton-loader class="col-3 w-100"></ngx-skeleton-loader>
+                            <ngx-skeleton-loader class="col-3 w-100"></ngx-skeleton-loader>
+                            <ngx-skeleton-loader class="col-3 w-100"></ngx-skeleton-loader>
+                            <ngx-skeleton-loader class="col-3 w-100"></ngx-skeleton-loader>
+                        </div>
+                        <mat-divider class="mb-2"></mat-divider>
+                        <ngx-skeleton-loader count="3"></ngx-skeleton-loader>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

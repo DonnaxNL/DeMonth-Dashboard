@@ -1,0 +1,30 @@
+<!-- Default -->
+<div *ngIf="userAddress?.country != 'uk'">
+    <p>
+        {{userAddress?.firstName}}
+        <span *ngIf="userAddress?.lastNamePrefix">
+            {{userAddress?.lastNamePrefix}}
+        </span>
+        {{userAddress?.lastName}}
+    </p>
+    <p *ngIf="userAddress?.streetOther">{{userAddress?.streetOther}}</p>
+    <p>{{userAddress?.street}} {{userAddress?.houseNo}}</p>
+    <p>{{userAddress?.postalCode.toUpperCase()}} {{userAddress?.city}}</p>
+    <p *ngIf="userAddress?.country != 'nl'">{{userAddress?.country | country}}</p>
+</div>
+
+<!-- UK Shipping Format -->
+<div *ngIf="userAddress?.country == 'uk'">
+    <p>
+        {{userAddress?.firstName}}
+        <span *ngIf="userAddress?.lastNamePrefix">
+            {{userAddress?.lastNamePrefix}}
+        </span>
+        {{userAddress?.lastName}}
+    </p>
+    <p>{{userAddress?.houseNo}} {{userAddress?.street}}</p>
+    <p *ngIf="userAddress?.streetOther">{{userAddress?.streetOther}}</p>
+    <p>{{userAddress?.city.toUpperCase()}}</p>
+    <p>{{userAddress?.postalCode}}</p>
+    <p>{{userAddress?.country | country}}</p>
+</div>

@@ -1,0 +1,113 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12" *ngIf="!isMobile" style="padding-top: 2rem"></div>
+        <div class="col-md my-auto" *ngIf="!isMobile">
+            <h2 class="my-auto">Report</h2>
+        </div>
+        <div class="col-12 col-md-auto p-2 d-flex my-auto justify-content-center">
+            <button mat-stroked-button disabled>
+                <i class="mr-1 fas fa-file-export"></i>
+                Export
+            </button>
+        </div>
+        <div class="col-12 col-md-auto p-2 d-flex my-auto justify-content-center" *ngIf="currentPage == 'range'">
+            <button mat-stroked-button (click)="pickerStart.open()">{{startDate | date:'dd-MM-yyyy'}}</button>
+            <mat-form-field style="width:0px;height:1px;visibility:hidden;">
+                <input matInput [matDatepicker]="pickerStart" [min]="minDate" [(ngModel)]="startDate"
+                    (ngModelChange)="onDateChanged()">
+                <mat-datepicker #pickerStart></mat-datepicker>
+            </mat-form-field>
+            <i class="my-auto ml-2 mr-2 fas fa-arrow-right"></i>
+            <button mat-stroked-button (click)="pickerEnd.open()">{{endDate | date:'dd-MM-yyyy'}}</button>
+            <mat-form-field style="width:0px;height:1px;visibility:hidden;">
+                <input matInput [matDatepicker]="pickerEnd" [min]="startDate" [(ngModel)]="endDate"
+                    (ngModelChange)="onDateChanged()">
+                <mat-datepicker #pickerEnd></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-auto p-2 d-flex my-auto justify-content-center" *ngIf="currentPage == 'alltime'">
+            <button mat-stroked-button (click)="goToPage('range')">Range Sales</button>
+        </div>
+        <!-- <mat-divider [vertical]="true" *ngIf="currentPage == 'range'"></mat-divider>
+        <div class="col-12 col-md-auto pl-2 d-flex my-auto justify-content-center" *ngIf="currentPage == 'range'">
+            <button mat-stroked-button (click)="goToPage('alltime')">All-Time Sales</button>
+        </div> -->
+    </div>
+    <hr>
+    <div *ngIf="currentPage == 'range'">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="infoblock side-smaller-padding">
+                        <div *ngIf="orders.length != 0">
+                            <div class="row" style="padding-left: 8px;">
+                                <div class="col-8">
+                                    <h6 class="pt-2">Graph</h6>
+                                </div>
+                                <div class="col-4 d-flex justify-content-end">
+                                    <button mat-button (click)="showGraph = !showGraph">
+                                        Hide
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chart" style="height: 300px; padding: 10px;" *ngIf="showGraph">
+                                <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels"
+                                    [options]="lineChartOptions" [chartType]="lineChartType"
+                                    [colors]="lineChartColors"></canvas>
+                            </div>
+                        </div>
+                        <div *ngIf="orders.length == 0">
+                            <div class="row">
+                                <div class="col-12">
+                                    <ngx-skeleton-loader class="w-100" [theme]="{ width: '200px', height: '30px'}">
+                                    </ngx-skeleton-loader>
+                                </div>
+                                <div class="col-12">
+                                    <ngx-skeleton-loader class="w-100" [theme]="{ height: '200px'}">
+                                    </ngx-skeleton-loader>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-2">
+                <div class="card">
+                    <div class="infoblock">
+                        <div *ngFor="let item of reportData; let i = index; last as last">
+                            <div class="row report-row">
+                                <h6 class="col-auto my-auto">
+                                    {{item.row}}
+                                </h6>
+                                <p class="col d-flex justify-content-end">
+                                    {{item.amount}}
+                                </p>
+                            </div>
+                            <mat-divider *ngIf="!last"></mat-divider>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-2">
+                <div class="card">
+                    <div class="infoblock">
+                        <div *ngFor="let item of boxData; let i = index; last as last">
+                            <div class="row report-row">
+                                <h6 class="col-auto my-auto">
+                                    {{item.row}}
+                                </h6>
+                                <p class="col d-flex justify-content-end">
+                                    {{item.amount}}
+                                </p>
+                            </div>
+                            <mat-divider *ngIf="!last"></mat-divider>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="currentPage == 'alltime'">
+
+    </div>
+</div>

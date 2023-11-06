@@ -1,0 +1,589 @@
+<div class="container" style="padding-top: 1.5rem">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/" href="#">Home</a></li>
+            <li class="breadcrumb-item"><a routerLink="/orders" href="#">Subscriptions</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Order details</li>
+        </ol>
+    </nav>
+
+    <div [hidden]="!dataLoaded">
+        <!-- Content -->
+        <div class="block special-padding">
+            <!-- Header -->
+            <div class="row">
+                <h4 class="col-6 col-md-9 d-flex justify-content-start">
+                    Order details
+                </h4>
+                <div class="col-6 col-md-3 d-flex justify-content-end">
+                    <button mat-icon-button (click)="changeHistory()">
+                        <mat-icon matTooltip="View change history">history</mat-icon>
+                    </button>
+                    <!-- <button mat-icon-button [matMenuTriggerFor]="menuOrderEdit"
+                        [disabled]="order?.subscriptionDetails.subscriptionStatus == 'canceled' || !userRole[2]">
+                        <mat-icon matTooltip="Edit subscription details">edit</mat-icon>
+                    </button> -->
+                    <mat-menu #menuOrderEdit="matMenu">
+                        <button mat-menu-item disabled>
+                            <i class="mr-2 mr-2 fas fa-exchange-alt"></i>
+                            <span>Change box</span>
+                        </button>
+                        <button mat-menu-item (click)="editCycle()">
+                            <i class="mr-2 fas fa-redo-alt"></i>
+                            <span>Edit cycle</span>
+                        </button>
+                        <button mat-menu-item (click)="pauseCancelOrder('pause')"
+                            [disabled]="order?.subscriptionDetails.subscriptionStatus == 'paused'">
+                            <i class="mr-2 mr-2 far fa-pause-circle"></i>
+                            <span>Pause subscription</span>
+                        </button>
+                        <button mat-menu-item (click)="pauseCancelOrder('cancel')">
+                            <i class="mr-2 far fa-stop-circle"></i>
+                            <span>Cancel subscription</span>
+                        </button>
+                        <button mat-menu-item disabled>
+                            <i class="mr-2 fas fa-money-bill"></i>
+                            Payments
+                        </button>
+                    </mat-menu>
+                    <button mat-icon-button [matMenuTriggerFor]="menuOrder" [disabled]="!userRole[2]">
+                        <mat-icon matTooltip="More">more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menuOrder="matMenu">
+                        <button mat-menu-item (click)="openInFirebase()">
+                            <mat-icon>launch</mat-icon>
+                            <span>Open in Firebase</span>
+                        </button>
+                        <button mat-menu-item [matMenuTriggerFor]="subMenuOrder">
+                            <mat-icon>more_horiz</mat-icon>
+                            <span>More</span>
+                        </button>
+                    </mat-menu>
+                    <mat-menu #subMenuOrder="matMenu">
+                        <button mat-menu-item (click)="deleteOrder()">
+                            <mat-icon>delete</mat-icon>
+                            <span>Remove order</span>
+                        </button>
+                        <button mat-menu-item (click)="createPaymentLink()" [disabled]="order?.paymentDetails?.isPaid">
+                            <mat-icon>money</mat-icon>
+                            <span>Create payment link</span>
+                        </button>
+                    </mat-menu>
+                </div>
+            </div>
+            <p>ID: {{order?.orderId}}</p>
+            <p>
+                Subscription status: {{order?.subscriptionDetails.subscriptionStatus | titlecase}}
+                <span *ngIf="order?.subscriptionDetails.lastDeliveryDate && order?.subscriptionDetails.lastDeliveryDate > today">
+                    (Last Delivery on: {{order?.subscriptionDetails.lastDeliveryDate.toDate() | date:'dd-MM-yyyy'}})
+                </span>
+            </p>
+            <p *ngIf="order?.subscriptionDetails.cancelDate">
+                Cancel Date: {{order?.subscriptionDetails.cancelDate.toDate() | date:'d MMMM yyyy'}}
+            </p>
+            <p *ngIf="order?.subscriptionDetails.cancelReason">
+                Cancel Reason: {{order?.subscriptionDetails.cancelReason}}
+            </p>
+            <p>Customer: <a [routerLink]="['/customers/' + order?.userId]"
+                    [state]="{customer: customer}">{{customer?.firstName}} <span
+                        *ngIf="customer?.lastNamePrefix">{{customer?.lastNamePrefix}}</span> {{customer?.lastName}}
+                    ({{customer?.email}})</a>
+            </p>
+            <!-- Details -->
+            <div class="row mt-4">
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <h6>Order reference</h6>
+                    <p class="mb-2">{{order?.orderReference}}</p>
+                    <h6>Ordered on</h6>
+                    <p class="mb-2">
+                        {{order?.orderCreated.seconds * 1000 | date:'dd-MM-yyyy - HH:mm'}}
+                    </p>
+                    <div [hidden]="order?.paymentPlan == 0">
+                        <h6>Cycle</h6>
+                        <p class="mb-2">
+                            Delivery every {{order?.deliveryDaysApart}} days
+                        </p>
+                    </div>
+                    <div
+                        *ngIf="showNextDelivery && onlyUpcoming.length > 0 || order?.subscriptionDetails.lastDeliveryDate">
+                        <h6>Upcoming delivery dates</h6>
+                        <mat-select placeholder="{{onlyUpcoming[0] | date:'d MMMM yyyy'}}">
+                            <mat-option *ngFor="let date of onlyUpcoming">
+                                {{date | date:'d MMMM yyyy'}}
+                            </mat-option>
+                        </mat-select>
+                    </div>
+                    <div *ngIf="onlyUpcoming.length == 0">
+                        <h6>Delivery date</h6>
+                        <p class="mb-2">{{order?.startDeliveryDate.seconds * 1000 | date:'dd-MM-yyyy'}}</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 pb-2">
+                    <h6>Shipping Address</h6>
+                    <div class="mb-4" *ngIf="order?.shippingAddress">
+                        <address-view [userAddress]="order?.shippingAddress"></address-view>
+                    </div>
+                    <h6>Billing Address</h6>
+                    <div *ngIf="billShipAddressSame && order?.shippingAddress">
+                        <p>Same as shipping address.</p>
+                    </div>
+                    <div *ngIf="!billShipAddressSame && order?.shippingAddress">
+                        <address-view [userAddress]="customer?.address"></address-view>
+                    </div>
+                </div>
+                <div class="col-md-12 col-lg-5">
+                    <h6>Checkout summary</h6>
+                    <checkout-summary [checkoutSummary]="order?.checkoutSummary" [order]="order"></checkout-summary>
+                </div>
+            </div>
+            <hr style="margin-bottom: 0.5em;">
+            <!-- Actions -->
+            <div class="row d-flex justify-content-end">
+                <div class="col-12 col-md-auto actions">
+                    <button mat-button color="primary" disabled>
+                        <i class="mr-2 mr-2 fas fa-exchange-alt"></i>
+                        <span>Change box</span>
+                    </button>
+                </div>
+                <div class="col-12 col-md-auto actions" [hidden]="order?.paymentPlan == 0">
+                    <button mat-button color="primary" (click)="editCycle()">
+                        <i class="mr-2 fas fa-redo-alt"></i>
+                        <span>Edit cycle</span>
+                    </button>
+                </div>
+                <div class="col-12 col-md-auto actions" [hidden]="order?.paymentPlan == 0">
+                    <button mat-button color="primary" (click)="pauseCancelOrder('pause')"
+                        [disabled]="order?.subscriptionDetails.subscriptionStatus == 'paused'">
+                        <i class="mr-2 mr-2 far fa-pause-circle"></i>
+                        <span>Pause</span>
+                    </button>
+                </div>
+                <div class="col-12 col-md-auto actions">
+                    <button mat-button color="primary" (click)="pauseCancelOrder('cancel')">
+                        <i class="mr-2 far fa-stop-circle"></i>
+                        <span>Cancel</span>
+                    </button>
+                </div>
+                <div class="col-12 col-md-auto actions">
+                    <button mat-button color="primary" disabled>
+                        <i class="mr-2 fas fa-money-bill"></i>
+                        Payments
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Products -->
+        <div class="block mt-3 mb-3 section-table">
+            <div class="row side-padding">
+                <div class="col-10 col-md order-1 order-md-1 my-auto d-flex justify-content-start">
+                    <h5>Chosen products ({{order?.productQuantity}})</h5>
+                </div>
+                <div *ngIf="order?.boxId != 'box_01'"
+                    class="col-12 col-md-auto order-3 order-md-2 my-auto d-flex justify-content-end">
+                    <p>
+                        Remove cotton swabs:
+                        <span *ngIf="order?.products.removeBuds">Yes</span>
+                        <span *ngIf="!order?.products.removeBuds">No</span>
+                    </p>
+                </div>
+                <div class="col-2 col-md-auto order-2 order-md-3 d-flex justify-content-end">
+                    <!-- [disabled]="order?.subscriptionDetails.subscriptionStatus == 'canceled' || !userRole[2]"> -->
+                    <button mat-icon-button disabled>
+                        <mat-icon matTooltip="Edit products">edit</mat-icon>
+                    </button>
+                </div>
+            </div>
+            <table mat-table [dataSource]="dataSourceProducts">
+
+                <!--- Note that these columns can be defined in any order.
+                                                          The actual rendered columns are set as a property on the row definition" -->
+
+                <!-- Brand Column -->
+                <ng-container matColumnDef="brand">
+                    <th mat-header-cell *matHeaderCellDef>Brand</th>
+                    <td mat-cell *matCellDef="let product"> {{product.brand}} </td>
+                </ng-container>
+
+                <!-- Type Column -->
+                <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef>Type</th>
+                    <td mat-cell *matCellDef="let product"> {{product.type}} </td>
+                </ng-container>
+
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Name</th>
+                    <td mat-cell *matCellDef="let product">
+                        <span *ngIf="product.id == 'TR'">Regular</span>
+                        <span *ngIf="product.id == 'TS'">Super</span>
+                        <span *ngIf="product.id == 'TSP'">Super Plus</span>
+                        <span *ngIf="product.id == 'PR'">Ultra-Thin Regular</span>
+                        <span *ngIf="product.id == 'PS'">Ultra-Thin Super</span>
+                        <span *ngIf="product.id == 'PMR'">Maxi Regular</span>
+                        <span *ngIf="product.id == 'PMS'">Maxi Super</span>
+                        <span *ngIf="product.id == 'LL'">Ultra-Thin</span>
+                        <span *ngIf="product.id == 'LEL'">Ultra-Thin Long</span>
+                    </td>
+                </ng-container>
+
+                <!-- Amount Column -->
+                <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef>Amount</th>
+                    <td mat-cell *matCellDef="let product"> {{product.amount}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <div *ngIf="order?.products.extraProducts">
+                <h6 class="mt-3 side-padding"><b>Extra products</b></h6>
+                <table mat-table [dataSource]="dataSourceExtraProducts">
+
+                    <!--- Note that these columns can be defined in any order.
+                                                          The actual rendered columns are set as a property on the row definition" -->
+
+                    <!-- Brand Column -->
+                    <ng-container matColumnDef="brand">
+                        <th mat-header-cell *matHeaderCellDef>Brand</th>
+                        <td mat-cell *matCellDef="let product"> {{product.brand}} </td>
+                    </ng-container>
+
+                    <!-- Type Column -->
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef>Type</th>
+                        <td mat-cell *matCellDef="let product"> {{product.type}} </td>
+                    </ng-container>
+
+
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>Name</th>
+                        <td mat-cell *matCellDef="let product">
+                            <span *ngIf="product.id == 'TR'">Regular</span>
+                            <span *ngIf="product.id == 'TS'">Super</span>
+                            <span *ngIf="product.id == 'TSP'">Super Plus</span>
+                            <span *ngIf="product.id == 'PR'">Ultra-Thin Regular</span>
+                            <span *ngIf="product.id == 'PS'">Ultra-Thin Super</span>
+                            <span *ngIf="product.id == 'PMR'">Maxi Regular</span>
+                            <span *ngIf="product.id == 'PMS'">Maxi Super</span>
+                            <span *ngIf="product.id == 'LL'">Ultra-Thin</span>
+                            <span *ngIf="product.id == 'LEL'">Ultra-Thin Long</span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Price Column -->
+                    <ng-container matColumnDef="price">
+                        <th mat-header-cell *matHeaderCellDef>Price</th>
+                        <td mat-cell *matCellDef="let product">
+                            {{product.price / 100 | currency:'EUR':'symbol':'1.2-2':'nl'}}
+                        </td>
+                    </ng-container>
+
+                    <!-- Amount Column -->
+                    <ng-container matColumnDef="amount">
+                        <th mat-header-cell *matHeaderCellDef>Amount</th>
+                        <td mat-cell *matCellDef="let product"> {{product.amount}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsExtraProducts"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsExtraProducts;"></tr>
+                </table>
+            </div>
+        </div>
+        <!-- Preferences -->
+        <div *ngIf="order?.boxId != 'box_01'" class="block special-padding mt-3 mb-3">
+            <div class="row">
+                <div class="col-9 my-auto d-flex justify-content-start">
+                    <h5>Preferences</h5>
+                </div>
+                <div class="col-3 d-flex justify-content-end">
+                    <!-- [disabled]="order?.subscriptionDetails.subscriptionStatus == 'canceled' || !userRole[2]"> -->
+                    <button mat-icon-button disabled>
+                        <mat-icon matTooltip="Edit preferences">edit</mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            <p *ngIf="!order?.products.preferences">No preferences given.</p>
+            <div *ngIf="order?.products.preferences" class="row">
+                <div class="col-12 col-md-6 mb-2">
+                    <h6>Chocolate</h6>
+                    <mat-chip-list aria-label="Chocolate selection">
+                        <mat-chip color="primary" selected style="color: white"
+                            *ngFor="let item of order?.products.preferences.chocolate; let i = index">
+                            <span *ngIf="item == 'none'">No chocolate</span>
+                            <span *ngIf="item == 'no_pref'">No preference</span>
+                            <span *ngIf="item.name">{{item.name}}</span>
+                        </mat-chip>
+                    </mat-chip-list>
+                </div>
+                <div class="col-12 col-md-6 mb-2">
+                    <h6>Health Bar</h6>
+                    <mat-chip-list aria-label="Health Bar selection">
+                        <mat-chip color="primary" selected style="color: white"
+                            *ngFor="let item of order?.products.preferences.healthbar; let i = index">
+                            <span *ngIf="item == 'none'">No healthbar</span>
+                            <span *ngIf="item == 'no_pref'">No preference</span>
+                            <span *ngIf="item.name">{{item.name}}</span>
+                        </mat-chip>
+                        <mat-chip color="primary" selected style="color: white"
+                            *ngIf="!order?.products.preferences.healthbar">
+                            No health bar
+                        </mat-chip>
+                    </mat-chip-list>
+                </div>
+                <div class="col-12 col-md-6 mb-2">
+                    <h6>Granola</h6>
+                    <mat-chip-list aria-label="Granola selection">
+                        <mat-chip color="primary" selected style="color: white"
+                            *ngFor="let item of order?.products.preferences.granola; let i = index">
+                            <span *ngIf="item == 'none'">No granola</span>
+                            <span *ngIf="item == 'no_pref'">No preference</span>
+                            <span *ngIf="item.name">{{item.name}}</span>
+                        </mat-chip>
+                        <mat-chip color="primary" selected style="color: white"
+                            *ngIf="!order?.products.preferences.granola">
+                            No granola
+                        </mat-chip>
+                    </mat-chip-list>
+                </div>
+                <div class="col-12 col-md-6">
+                    <h6>Skin type</h6>
+                    <mat-chip-list aria-label="Skin selection">
+                        <mat-chip color="primary" selected style="color: white">
+                            <span *ngIf="order?.products.preferences.skinType == 'normal'">
+                                Normal
+                            </span>
+                            <span *ngIf="order?.products.preferences.skinType == 'mixed'">
+                                Mixed/Combination
+                            </span>
+                            <span *ngIf="order?.products.preferences.skinType == 'dry'">
+                                Dry
+                            </span>
+                            <span *ngIf="order?.products.preferences.skinType == 'oil'">
+                                Oily
+                            </span>
+                            <span *ngIf="order?.products.preferences.skinType == 'no_pref'">
+                                No preference
+                            </span>
+                        </mat-chip>
+                    </mat-chip-list>
+                </div>
+            </div>
+        </div>
+        <!-- Deliveries -->
+        <div class="block mt-3 mb-3 section-table">
+            <div class="row side-padding">
+                <div class="col-9 d-flex my-auto justify-content-start">
+                    <h5>Deliveries</h5>
+                </div>
+                <div class="col-3 d-flex justify-content-end">
+                    <button mat-icon-button [matMenuTriggerFor]="menuDeliveries">
+                        <mat-icon matTooltip="More">more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menuDeliveries="matMenu">
+                        <button mat-menu-item (click)="showUpcomingDeliveries()">
+                            <div *ngIf="!showUpcoming">
+                                Show upcoming deliveries
+                            </div>
+                            <div *ngIf="showUpcoming">
+                                Hide upcoming deliveries
+                            </div>
+                        </button>
+                        <button mat-menu-item (click)="addNewDelivery()" [hidden]="!userRole[0]">
+                            Add delivery
+                        </button>
+                    </mat-menu>
+                </div>
+            </div>
+            <table mat-table [dataSource]="dataSourceDeliveries">
+
+                <!--- Note that these columns can be defined in any order.
+                The actual rendered columns are set as a property on the row definition" -->
+
+                <!-- Number Column -->
+                <ng-container matColumnDef="deliveryNo">
+                    <th mat-header-cell *matHeaderCellDef
+                        matTooltip="* Delivery number might not be accurate for subscriptions made before May 2020.">
+                        Delivery No.*
+                    </th>
+                    <td mat-cell *matCellDef="let delivery"> Box {{delivery.number}} </td>
+                </ng-container>
+
+                <!-- Date Column -->
+                <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef>Date</th>
+                    <td mat-cell *matCellDef="let delivery"> {{delivery.deliveryDate.toDate() | date:'dd-MM-yy'}}
+                    </td>
+                </ng-container>
+
+                <!-- IsDelivered Column -->
+                <ng-container matColumnDef="isPacked">
+                    <th mat-header-cell *matHeaderCellDef>Packed</th>
+                    <td mat-cell *matCellDef="let delivery">
+                        <!-- (change)="setDeliveryStatus($event, delivery, false)" -->
+                        <mat-checkbox (click)="$event.stopPropagation()" [checked]="delivery.packing?.isPacked"
+                            [disabled]="true" #tooltip="matTooltip"
+                            matTooltip="Packed by: {{delivery.packing?.packedBy}}">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <!-- IsDelivered Column -->
+                <ng-container matColumnDef="isDelivered">
+                    <th mat-header-cell *matHeaderCellDef>Shipped</th>
+                    <td mat-cell *matCellDef="let delivery">
+                        <mat-checkbox (click)="$event.stopPropagation()" [checked]="delivery.delivery?.isDelivered"
+                            [disabled]="true" #tooltip="matTooltip"
+                            matTooltip="Shipping initiated by: {{delivery.delivery?.deliveryInitiatedBy}}">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <!-- Paid Column -->
+                <ng-container matColumnDef="isPaid">
+                    <th mat-header-cell *matHeaderCellDef>Paid</th>
+                    <td mat-cell *matCellDef="let delivery">
+                        <span *ngIf="delivery.paymentDetails?.isPaid">
+                            <div *ngIf="!delivery.paymentDetails?.directLink || !userRole[4]">Yes</div>
+                            <div *ngIf="delivery.paymentDetails?.directLink  && userRole[4]">
+                                <a href="{{delivery.paymentDetails?.directLink}}" target="_blank">Yes</a>
+                            </div>
+                        </span>
+                        <span *ngIf="!delivery.paymentDetails?.isPaid">
+                            No
+                            <span *ngIf="delivery.paymentDetails?.bankReasonCode"> (Chargeback)</span>
+                        </span>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsDeliveries"></tr>
+                <tr mat-row class="redirect-row" *matRowDef="let row; columns: displayedColumnsDeliveries;"
+                    (click)="showDeliveryDetails(orderId, row)"></tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="[6, 12, 24]" showFirstLastButtons></mat-paginator>
+        </div>
+        <!-- Promos -->
+        <div [hidden]="order?.paymentPlan == 0" class="block mt-3 mb-3 section-table">
+            <div class="row side-padding">
+                <div class="col-12 d-flex justify-content-start">
+                    <h5>Incentive claims (DeMonthly Points/DeMonthly Invite)</h5>
+                </div>
+            </div>
+            <table [hidden]="dataSourceIncentiveClaims.data.length == 0" mat-table
+                [dataSource]="dataSourceIncentiveClaims">
+
+                <!--- Note that these columns can be defined in any order.
+                The actual rendered columns are set as a property on the row definition" -->
+
+                <!-- orderRef Column -->
+                <ng-container matColumnDef="orderRef">
+                    <th mat-header-cell *matHeaderCellDef>OrderRef</th>
+                    <td mat-cell *matCellDef="let promo"> {{promo.orderRef}} </td>
+                </ng-container>
+
+                <!-- Type Column -->
+                <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef>Type</th>
+                    <td mat-cell *matCellDef="let promo"> {{promo.type}} </td>
+                </ng-container>
+
+                <!-- Date Column -->
+                <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef>Claimed on</th>
+                    <td mat-cell *matCellDef="let promo"> {{promo.date | date:'dd-MM-yyyy'}} </td>
+                </ng-container>
+
+                <!-- Delivery Column -->
+                <ng-container matColumnDef="delivery">
+                    <th mat-header-cell *matHeaderCellDef>Delivery on</th>
+                    <td mat-cell *matCellDef="let promo"> {{promo.delivery | date:'dd-MM-yyyy'}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsIncentiveClaims"></tr>
+                <tr mat-row class="redirect-row" *matRowDef="let row; columns: displayedColumnsIncentiveClaims;"
+                    (click)="showOrderDetails(row)"></tr>
+            </table>
+            <p class="side-padding" [hidden]="dataSourceIncentiveClaims.data.length > 0">
+                No box claimed with DeMonthly Point or DeMonthly Invite yet.
+            </p>
+        </div>
+        <!-- Payments -->
+        <div [hidden]="order?.paymentPlan == 0 && !order.checkoutSummary.points" class="block mt-3 mb-3 section-table">
+            <div class="row side-padding">
+                <div class="col-9 d-flex my-auto justify-content-start">
+                    <h5>Payments</h5>
+                </div>
+                <div class="col-3 d-flex justify-content-end">
+                    <button mat-icon-button [matMenuTriggerFor]="menuPayments">
+                        <mat-icon matTooltip="More">more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menuPayments="matMenu">
+                        <button mat-menu-item (click)="showExpiredPayments()">
+                            <div *ngIf="!showExpired">
+                                Show expired payments
+                            </div>
+                            <div *ngIf="showExpired">
+                                Hide expired payments
+                            </div>
+                        </button>
+                    </mat-menu>
+                </div>
+            </div>
+            <table mat-table [dataSource]="dataSourcePayments">
+
+                <!--- Note that these columns can be defined in any order.
+                                                          The actual rendered columns are set as a property on the row definition" -->
+
+                <!-- Id Column -->
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef>Description</th>
+                    <td mat-cell *matCellDef="let delivery"> {{delivery.description}} </td>
+                </ng-container>
+
+                <!-- Date Column -->
+                <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef>Date</th>
+                    <td mat-cell *matCellDef="let delivery"> {{delivery.date | date:'dd-MM-yyyy'}}
+                    </td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>Status</th>
+                    <td mat-cell *matCellDef="let delivery"> {{delivery.status}} </td>
+                </ng-container>
+
+                <!-- amount Column -->
+                <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef>Amount</th>
+                    <td mat-cell *matCellDef="let delivery">
+                        {{delivery.amount | currency:'EUR':'symbol':'1.2-2':'nl'}}
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsPayments"></tr>
+                <tr mat-row class="redirect-row" *matRowDef="let row; columns: displayedColumnsPayments;"
+                    (click)="openPaymentDetails(row)"></tr>
+            </table>
+            <!-- <p *ngIf="!allPayments || allPayments.length == 0" class="d-flex justify-content-center">
+                No payments found.
+            </p> -->
+            <div class="mt-4 side-padding">
+                <small>
+                    For payments before April 2021, please refer to the old
+                    <a href="https://www.mollie.com/dashboard/org_4085344/customers?query={{customer?.email}}"
+                        target="_blank">Mollie Dashboard</a>
+                    and search for: {{customer?.email}}.
+                </small>
+            </div>
+
+        </div>
+    </div>
+    <div [hidden]="dataLoaded">
+        <div class="col-12 d-flex justify-content-center">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</div>

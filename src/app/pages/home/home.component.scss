@@ -1,0 +1,50 @@
+@import '~@angular/material/theming';
+
+.card {
+  @include mat-elevation(0);
+  border: 1px solid #E5E5E5;
+  border-radius: 10px;
+}
+
+.infoblock {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  height: 100%;
+  position: relative;
+}
+
+.info-side-padding {
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.side-smaller-padding {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.order-row {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+.order-row:hover {
+  cursor: pointer;
+  background-color: #feeeed;
+}
+
+.link {
+  text-transform: uppercase;
+  color: #F8BEB8;
+}
+
+.link:hover {
+  color: #F8BEB8;
+  cursor: pointer;
+}
+
+.link-text:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,24 @@
+.mat-column-type {
+    flex: 0 0 40%;
+}
+// .mat-column-brand {
+//     flex: 0 0 15%;
+// }
+.mat-column-product {
+    flex: 0 0 40%;
+}
+.mat-column-inventory {
+    flex: 0 0 20%;
+}
+
+.mat-dialog-content {
+    padding: 0;
+}
+
+.mat-expansion-panel:not([class*="mat-elevation-z"]) {
+    box-shadow: none;
+}
+
+table {
+    width: 100%;
+}

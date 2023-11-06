@@ -1,0 +1,57 @@
+<!-- Default dialog -->
+<h2 *ngIf="!savingState" mat-dialog-title>Change box</h2>
+<div *ngIf="!savingState" mat-dialog-content>
+    <h6>This change will go into effect for the next delivery.</h6>
+    <p>Current box:  {{data.order.boxName}}<br>
+        Current payment plan: 
+        <span *ngIf="data.order.paymentPlan == 1">Monthly</span>
+        <span *ngIf="data.order.paymentPlan != 1">{{data.order.paymentPlan}} months</span>
+        <br>
+        Current pricing: {{data.order.checkoutSummary.checkoutPrice / 100 | currency:'EUR':'symbol':'1.2-2':'nl'}}
+    </p>
+    <hr>
+    <p>Select box:</p>
+    <mat-radio-group class="row" aria-label="Select box" [(ngModel)]="boxSelected" (ngModelChange)="onChange()">
+        <mat-radio-button class="col-12 col-md-4" value="box_01">Basic</mat-radio-button>
+        <mat-radio-button class="col-12 col-md-4" value="box_02">Plus</mat-radio-button>
+        <mat-radio-button class="col-12 col-md-4" value="box_03">Complete</mat-radio-button>
+    </mat-radio-group>
+    <p>Select payment plan:</p>
+    <mat-radio-group class="row" aria-label="Select payment plan" [(ngModel)]="planSelected" (ngModelChange)="onChange()">
+        <mat-radio-button class="col-12 col-md-4" value="1">Monthly</mat-radio-button>
+        <mat-radio-button class="col-12 col-md-4" value="3">3 months</mat-radio-button>
+        <mat-radio-button class="col-12 col-md-4" value="12">12 months</mat-radio-button>
+    </mat-radio-group>
+    <hr>
+    <p>
+        New pricing: {{checkoutSummary?.checkoutPrice / 100 | currency:'EUR':'symbol':'1.2-2':'nl'}}
+    </p>
+</div>
+<!-- Saving state -->
+<h2 *ngIf="savingState && !loadingDone" mat-dialog-title>Saving changes...</h2>
+<div *ngIf="savingState && !loadingDone" mat-dialog-content>
+    <div class="col-12 d-flex justify-content-center">
+        <mat-spinner></mat-spinner>
+    </div>
+    <p class="col-12 d-flex justify-content-center">Please wait...</p>
+</div>
+<!-- Saved state -->
+<h2 *ngIf="loadingDone" mat-dialog-title>Changes saved!</h2>
+<div *ngIf="loadingDone" mat-dialog-content>
+    <p *ngIf="nextDeliveryDate" class="col-12 d-flex justify-content-center">
+        This change will go into effect for the next delivery.<br>
+        Your next payment will be on .
+        <!-- {{ nextDeliveryDate | date:'d MMMM yyyy'}} -->
+    </p>
+    <p *ngIf="deliveryDates" class="col-12 d-flex justify-content-center">
+        This change will go into effect for the next delivery.<br>
+        Your next payment will be on .
+        <!-- {{ deliveryDates[0] | date:'d MMMM yyyy'}} -->
+    </p>
+</div>
+<!-- Actions -->
+<div mat-dialog-actions style="justify-content: flex-end;">
+    <button mat-button *ngIf="!loadingDone" (click)="onNoClick()" [disabled]="savingState">Cancel</button>
+    <button mat-raised-button color="primary" *ngIf="!savingState" (click)="changeBox()">Save</button>
+    <button mat-button *ngIf="loadingDone" (click)="onNoClick()">Close</button>
+</div>

@@ -1,0 +1,113 @@
+<h1 mat-dialog-title>Change history</h1>
+<div mat-dialog-content>
+    <div *ngIf="dialogData.history">
+        <div class="row" *ngFor="let item of dialogData.history; let i = index">
+            <p class="col-12 col-md mb-0">
+                {{item.changeType}}
+            </p>
+            <p class="col-12 col-md-auto mb-0">
+                {{item.dateChanged.toDate() | date:'dd-MM-yyyy HH:mm'}}
+            </p>
+            <div *ngIf="item.changes" class="col-12 row">
+                <div *ngIf="item.changes.before" class="col-12 col-md-6 pt-2">
+                    <h6>Before:</h6>
+                    <p *ngIf="item.changes.before.box">{{item.changes.before.box}}<br></p>
+                    <p *ngIf="item.changes.before.paymentPlan">{{item.changes.before.paymentPlan}} month plan<br></p>
+                    <p *ngIf="item.changes.before.cycleDays">Cycle days: {{item.changes.before.cycleDays}} days<br></p>
+                    <p *ngIf="item.changes.before.cycleDate">Cycle date: {{item.changes.before.cycleDate.toDate() | date:'dd-MM-yyyy'}}</p>
+                    <p *ngIf="item.changes.before.nextDelivery">Next delivery: {{item.changes.before.nextDelivery.toDate() | date:'dd-MM-yyyy'}}</p>
+                    <p *ngIf="item.changes.before.productQuantity">Product quantity: {{item.changes.before.productQuantity}}<br></p>
+                    <p *ngIf="item.changes.before.products">Products: Please refer to the Firebase listing<br></p>
+                    <p *ngIf="item.changes.before.preferences">Preferences:<br>
+                        Chocolate: 
+                        <span *ngFor="let chocolate of item.changes.before.preferences.chocolate; let i=index">
+                            <span *ngIf="chocolate.name">
+                                {{chocolate.name}}<span *ngIf="i < (item.changes.before.preferences.chocolate.length-1)">, </span>
+                            </span>
+                            <span *ngIf="!chocolate.name">{{chocolate}}</span>
+                        </span>
+                        <span *ngIf="!item.changes.before.preferences.chocolate">none</span><br>
+                        Health Bar: 
+                        <span *ngFor="let healthbar of item.changes.before.preferences.healthbar; let i=index">
+                            <span *ngIf="healthbar.name">
+                                {{healthbar.name}}<span *ngIf="i < (item.changes.before.preferences.healthbar.length-1)">, </span>
+                            </span>
+                            <span *ngIf="!healthbar.name">{{healthbar}}</span>
+                        </span>
+                        <span *ngIf="!item.changes.before.preferences.healthbar">none</span><br>
+                        Granola: 
+                        <span *ngFor="let granola of item.changes.before.preferences.granola; let i=index">
+                            <span *ngIf="granola.name">
+                                {{granola.name}}<span *ngIf="i < (item.changes.before.preferences.granola.length-1)">, </span>
+                            </span>
+                            <span *ngIf="!granola.name">{{granola}}</span>
+                        </span>
+                        <span *ngIf="!item.changes.before.preferences.granola">none</span><br>
+                        Skin Type: {{item.changes.before.preferences.skinType}}
+                    </p>
+                    <div *ngIf="item.changes.before.shippingAddress">
+                        <p>Shipping address:</p><br>
+                        <address-view [userAddress]="item.changes.before.shippingAddress"></address-view>
+                    </div>
+                </div>
+                <div *ngIf="item.changes.after" class="col-12 col-md-6 pt-2">
+                    <h6>After:</h6>
+                    <p *ngIf="item.changes.after.box">{{item.changes.after.box}}<br></p>
+                    <p *ngIf="item.changes.after.paymentPlan">{{item.changes.after.paymentPlan}} month plan<br></p>
+                    <p *ngIf="item.changes.after.cycleDays">Cycle days: {{item.changes.after.cycleDays}} days<br></p>
+                    <p *ngIf="item.changes.after.cycleDate">Cycle date: {{item.changes.after.cycleDate.toDate() | date:'dd-MM-yyyy'}}</p>
+                    <p *ngIf="item.changes.after.pauseType">Pause: {{item.changes.after.pauseType}} months<br></p>
+                    <p *ngIf="item.changes.after.nextDelivery">Resume: {{item.changes.after.nextDelivery.toDate() | date:'dd-MM-yyyy'}}</p>
+                    <p *ngIf="item.changes.after.productQuantity">Product quantity: {{item.changes.after.productQuantity}}<br></p>
+                    <p *ngIf="item.changes.after.products">Products: Please refer to the Firebase listing<br></p>
+                    <p *ngIf="item.changes.after.preferences">Preferences:<br>
+                        Chocolate: 
+                        <span *ngFor="let chocolate of item.changes.after.preferences.chocolate; let i=index">
+                            <span *ngIf="chocolate.name">
+                                {{chocolate.name}}<span *ngIf="i < (item.changes.after.preferences.chocolate.length-1)">, </span>
+                            </span>
+                            <span *ngIf="!chocolate.name">{{chocolate}}</span>
+                        </span>
+                        <span *ngIf="!item.changes.after.preferences.chocolate">none</span><br>
+                        Health Bar: 
+                        <span *ngFor="let healthbar of item.changes.after.preferences.healthbar; let i=index">
+                            <span *ngIf="healthbar.name">
+                                {{healthbar.name}}<span *ngIf="i < (item.changes.after.preferences.healthbar.length-1)">, </span>
+                            </span>
+                            <span *ngIf="!healthbar.name">{{healthbar}}</span>
+                        </span>
+                        <span *ngIf="!item.changes.after.preferences.healthbar">none</span><br>
+                        Granola: 
+                        <span *ngFor="let granola of item.changes.after.preferences.granola; let i=index">
+                            <span *ngIf="granola.name">
+                                {{granola.name}}<span *ngIf="i < (item.changes.after.preferences.granola.length-1)">, </span>
+                            </span>
+                            <span *ngIf="!granola.name">{{granola}}</span>
+                        </span>
+                        <span *ngIf="!item.changes.after.preferences.granola">none</span><br>
+                        Skin Type: {{item.changes.after.preferences.skinType}}
+                    </p>
+                    <div *ngIf="item.changes.after.shippingAddress">
+                        <p>Shipping address:</p><br>
+                        <address-view [userAddress]="item.changes.after.shippingAddress"></address-view>
+                    </div>
+                </div>
+                <p *ngIf="item.changes.boxClaimed" class="col-12 pt-2">
+                    <b>Box claimed:</b><br>
+                    Box: {{item.changes.boxClaimed.boxName}}<br>
+                    Claimed at: {{item.changes.boxClaimed.claimedAt.toDate() | date:'dd-MM-yyyy'}}<br>
+                    <!-- Order Id: {{item.changes.boxClaimed.orderId}}<br> -->
+                    Order Reference: {{item.changes.boxClaimed.orderRef}}<br>
+                    Delivery: {{item.changes.boxClaimed.startDeliveryDate.toDate() | date:'dd-MM-yyyy'}}
+                </p>
+            </div>
+            <hr *ngIf="i != (dialogData.history.length-1)" class="col-11">
+        </div>
+    </div>
+    <div *ngIf="dialogData.history.length == 0">
+        <p>No history found.</p>
+    </div>
+</div>
+<div mat-dialog-actions style="justify-content: flex-end;">
+    <button mat-button mat-dialog-close>Close</button>
+</div>

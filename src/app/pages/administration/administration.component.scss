@@ -1,0 +1,73 @@
+@import '~@angular/material/theming';
+
+.card {
+  @include mat-elevation(0);
+  border: 1px solid #E5E5E5;
+  border-radius: 10px;
+}
+
+.example-container {
+    // position: absolute;
+    // top: 50px;
+    // bottom: 0;
+    // left: 0;
+    // right: 0;
+    height: 94vh;
+}
+
+.example-sidenav-content {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.example-sidenav {
+    padding: 20px;
+}
+
+.sidenav-header {
+    margin-top: 10px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-top: 20px;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.header-spacing {
+    margin-top: 2rem;
+}
+
+.active {
+    color: #fbc3bc;
+    //font-weight: bold !important;
+}
+
+.main {
+    padding-left: 240px;
+}
+
+@media (max-width: 480px) {
+    .header-spacing {
+        margin-top: 0px;
+    }
+
+    .main {
+        padding-left: 16px;
+    }
+}
+.link {
+  text-transform: uppercase;
+  color: #F8BEB8;
+}
+
+.link:hover {
+  color: #F8BEB8;
+  cursor: pointer;
+}
+
+.link-text:hover {
+  text-decoration: underline;
+}

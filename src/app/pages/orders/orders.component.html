@@ -1,0 +1,625 @@
+<div class="container" style="padding-top: 2rem">
+    <div class="row">
+        <div class="col-12 col-md-9">
+            <h2>
+                All subscriptions
+                <!-- <span [hidden]="!dataLoaded"> ({{allOnGoing?.length}})</span> -->
+            </h2>
+        </div>
+        <div class="col-12 col-md-3 d-flex justify-content-end">
+            <!-- <button mat-button (click)="exportToExcel('All')" [disabled]="!dataLoaded">Download All (Excel)</button> -->
+            <!-- <button mat-button (click)="convert()">Cycle</button> -->
+            <!-- <button mat-button (click)="convertSubscriptions()" [disabled]="!dataLoaded">Convert active</button> -->
+        </div>
+    </div>
+    <mat-tab-group mat-align-tabs="end" dynamicHeight>
+        <mat-tab label="Active ({{dataSourceActive?.data.length}})">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <mat-form-field>
+                            <mat-label>Filter</mat-label>
+                            <input matInput (keyup)="applyFilter($event, 'active')"
+                                placeholder="Search by ID, reference, customer, box, etc." [disabled]="!dataLoaded">
+                        </mat-form-field>
+                    </div>
+                    <!-- <div class="col-6 d-flex justify-content-end">
+                            <button mat-button (click)="exportToExcel('Active')">Download Excel</button>
+                        </div> -->
+                </div>
+
+                <div [hidden]="!dataLoaded">
+                    <mat-table [dataSource]="dataSourceActive" matSort #activeSort="matSort" class="block">
+
+                        <!-- Ref Column -->
+                        <ng-container matColumnDef="orderRef">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Order Ref </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Reference"> {{order.orderRef}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Box Column -->
+                        <ng-container matColumnDef="boxName">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Box </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Box"> {{order.boxName}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Plan Column -->
+                        <ng-container matColumnDef="paymentPlan">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Payment Plan </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Plan">
+                                <span *ngIf="order.paymentPlan == 0 && order.fullOrder.checkoutSummary.points">
+                                    DMP claim
+                                </span>
+                                <span *ngIf="order.paymentPlan == 0 && !order.fullOrder.checkoutSummary.points && order.fullOrder.boxId != 'box_13'">
+                                    Free referral box
+                                </span>
+                                <span *ngIf="order.paymentPlan == 1">Monthly</span>
+                                <span *ngIf="order.paymentPlan > 1">
+                                    {{order.paymentPlan}} month plan
+                                </span>
+                            </mat-cell>
+                        </ng-container>
+
+                        <!-- Cycle Days Column -->
+                        <ng-container matColumnDef="cycleDays">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Cycle Days </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Cycle"> {{order.cycleDays}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Customer Column -->
+                        <ng-container matColumnDef="customer">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Customer </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Customer"> {{order.customer}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Created Column -->
+                        <ng-container matColumnDef="created">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Order Created </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Created"> {{order.created |
+                                date:'dd-MM-yy hh:mm'}}
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showDetails(row)"></mat-row>
+                    </mat-table>
+
+                    <mat-paginator #activePaginator [pageSizeOptions]="[25, 50, 100]" showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+
+                <div [hidden]="dataLoaded" class="skeleton-border">
+                    <skc-table [skc-loading]="true" [skc-rows]="5" [skc-shadow-table]="false" [skc-footer]="true"
+                        [skc-columns]="6" [skc-headers]="displayedColumns">
+                    </skc-table>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Pending ({{dataSourcePending?.data.length}})">
+            <div class="container">
+                <div class="row">
+                    <div class="col-10">
+                        <mat-form-field>
+                            <mat-label>Filter</mat-label>
+                            <input matInput (keyup)="applyFilter($event, 'pending')"
+                                placeholder="Search by ID, reference, customer, box, etc." [disabled]="!dataLoaded">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2 d-flex justify-content-end">
+                        <button mat-icon-button [matMenuTriggerFor]="menuArchive" class="mt-3" [disabled]="!dataLoaded">
+                            <mat-icon matTooltip="More">more_vert</mat-icon>
+                        </button>
+                        <mat-menu #menuArchive="matMenu">
+                            <button mat-menu-item (click)="showArchived = !showArchived">
+                                <div *ngIf="!showArchived">
+                                    Show archived orders
+                                </div>
+                                <div *ngIf="showArchived">
+                                    Hide archived orders
+                                </div>
+                            </button>
+                        </mat-menu>
+                    </div>
+                </div>
+
+                <div [hidden]="dataLoaded" class="skeleton-border">
+                    <skc-table [skc-loading]="true" [skc-rows]="5" [skc-shadow-table]="false" [skc-footer]="true"
+                        [skc-columns]="6" [skc-headers]="displayedColumns">
+                    </skc-table>
+                </div>
+
+                <mat-table [hidden]="!dataLoaded" [dataSource]="dataSourcePending" matSort #pendingSort="matSort"
+                    class="block">
+
+                    <!-- Ref Column -->
+                    <ng-container matColumnDef="orderRef">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Order Ref </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Reference"> {{order.orderRef}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Box Column -->
+                    <ng-container matColumnDef="boxName">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Box </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Box"> {{order.boxName}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Plan Column -->
+                    <ng-container matColumnDef="paymentPlan">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payment Plan </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Plan">
+                            <span *ngIf="order.paymentPlan == 0 && order.fullOrder.boxId != 'box_13'">Free referral box</span>
+                            <span *ngIf="order.paymentPlan == 1">Monthly</span>
+                            <span *ngIf="order.paymentPlan > 1">
+                                {{order.paymentPlan}} month plan
+                            </span>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Cycle Days Column -->
+                    <ng-container matColumnDef="cycleDays">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Cycle Days </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Cycle"> {{order.cycleDays}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Customer Column -->
+                    <ng-container matColumnDef="customer">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Customer </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Customer"> {{order.customer}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Created Column -->
+                    <ng-container matColumnDef="created">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Order Created </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Created"> {{order.created |
+                            date:'dd-MM-yyyy'}}
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showDetails(row)"></mat-row>
+                </mat-table>
+
+                <div *ngIf="showArchived">
+                    <h5>Archived orders</h5>
+                    <mat-table [dataSource]="dataSourceArchived" class="block">
+
+                        <!-- Ref Column -->
+                        <ng-container matColumnDef="orderRef">
+                            <mat-header-cell *matHeaderCellDef> Order Ref </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Reference"> {{order.orderRef}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Box Column -->
+                        <ng-container matColumnDef="boxName">
+                            <mat-header-cell *matHeaderCellDef> Box </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Box"> {{order.boxName}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Plan Column -->
+                        <ng-container matColumnDef="paymentPlan">
+                            <mat-header-cell *matHeaderCellDef> Payment Plan </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Plan"> {{order.paymentPlan}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Cycle Days Column -->
+                        <ng-container matColumnDef="cycleDays">
+                            <mat-header-cell *matHeaderCellDef> Cycle Days </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Cycle"> {{order.cycleDays}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Customer Column -->
+                        <ng-container matColumnDef="customer">
+                            <mat-header-cell *matHeaderCellDef> Customer </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Customer"> {{order.customer}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Created Column -->
+                        <ng-container matColumnDef="created">
+                            <mat-header-cell *matHeaderCellDef> Order Created </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Created">
+                                {{order.created | date:'dd-MM-yyyy'}}
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showDetails(row)">
+                        </mat-row>
+                    </mat-table>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Coupon ({{dataSourcePromo?.data.length}})">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <mat-form-field>
+                            <mat-label>Filter</mat-label>
+                            <input matInput (keyup)="applyFilter($event, 'promo')"
+                                placeholder="Search by ID, reference, customer, box, etc." [disabled]="!dataLoaded">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-12 col-lg-6 d-flex  my-auto justify-content-end">
+                        <!-- <button mat-button (click)="exportToExcel('Promotion')">Download Excel</button> -->
+                        <div class="row">
+                            <div class="col-auto">
+                                <p>Active: {{promoActive}}</p>
+                            </div>
+                            <div class="col-auto">
+                                <p>Paused: {{promoPaused}}</p>
+                            </div>
+                            <div class="col">
+                                <p>Canceled: {{promoCanceled}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <mat-table [hidden]="!dataLoaded" [dataSource]="dataSourcePromo" matSort #promoSort="matSort"
+                    class="block mt-2">
+
+                    <!-- Ref Column -->
+                    <ng-container matColumnDef="orderRef">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Order Ref </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Reference"> {{order.orderRef}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Box Column -->
+                    <ng-container matColumnDef="boxName">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Box </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Box"> {{order.boxName}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Plan Column -->
+                    <ng-container matColumnDef="paymentPlan">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payment Plan </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Plan">
+                            <span *ngIf="order.paymentPlan == 0">Free referral box</span>
+                            <span *ngIf="order.paymentPlan == 1">Monthly</span>
+                            <span *ngIf="order.paymentPlan > 1">
+                                {{order.paymentPlan}} month plan
+                            </span>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Discount Column -->
+                    <ng-container matColumnDef="discount">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Discount </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Discount"> {{order.discount}}% </mat-cell>
+                    </ng-container>
+
+                    <!-- Customer Column -->
+                    <ng-container matColumnDef="customer">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Customer </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Customer"> {{order.customer}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Status Column -->
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Status">
+                            <span *ngIf="order.canceledAt" #tooltip="matTooltip"
+                                matTooltip="{{order.canceledAt | date:'dd-MM-yyyy'}} - {{order.fullOrder.subscriptionDetails?.cancelReason}}">
+                                {{order.status | titlecase}}
+                            </span>
+                            <span *ngIf="order.resume" #tooltip="matTooltip"
+                                matTooltip="Resume: {{order.resume | date:'dd-MM-yyyy'}}">
+                                {{order.status | titlecase}}
+                            </span>
+                            <span *ngIf="!order.canceledAt && !order.resume">{{order.status | titlecase}}</span>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Created Column -->
+                    <ng-container matColumnDef="created">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Order Created </mat-header-cell>
+                        <mat-cell *matCellDef="let order" data-label="Created">
+                            {{order.created | date:'dd-MM-yyyy'}}
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="displayedColumnsPromo"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumnsPromo;" (click)="showDetails(row)">
+                    </mat-row>
+                </mat-table>
+
+                <div [hidden]="dataLoaded" class="skeleton-border">
+                    <skc-table [skc-loading]="true" [skc-rows]="5" [skc-shadow-table]="false" [skc-footer]="true"
+                        [skc-columns]="7" [skc-headers]="displayedColumnsPromo">
+                    </skc-table>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Paused ({{dataSourcePaused?.data.length}})">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <mat-form-field>
+                            <mat-label>Filter</mat-label>
+                            <input matInput (keyup)="applyFilter($event, 'paused')"
+                                placeholder="Search by ID, reference, customer, box, etc." [disabled]="!dataLoaded">
+                        </mat-form-field>
+                    </div>
+                    <!-- <div class="col-6 d-flex justify-content-end">
+                            <button mat-button (click)="exportToExcel('Paused')">Download Excel</button>
+                        </div> -->
+                </div>
+
+                <div [hidden]="!dataLoaded">
+                    <mat-table [dataSource]="dataSourcePaused" matSort #pausedSort="matSort" class="block">
+
+                        <!-- Ref Column -->
+                        <ng-container matColumnDef="orderRef">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Order Ref </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Reference"> {{order.orderRef}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Box Column -->
+                        <ng-container matColumnDef="boxName">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Box </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Box"> {{order.boxName}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Plan Column -->
+                        <ng-container matColumnDef="paymentPlan">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Payment Plan </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Plan">
+                                <span *ngIf="order.paymentPlan == 0">Free referral box</span>
+                                <span *ngIf="order.paymentPlan == 1">Monthly</span>
+                                <span *ngIf="order.paymentPlan > 1">
+                                    {{order.paymentPlan}} month plan
+                                </span>
+                            </mat-cell>
+                        </ng-container>
+
+                        <!-- Cycle Days Column -->
+                        <ng-container matColumnDef="cycleDays">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Cycle Days </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Cycle"> {{order.cycleDays}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Customer Column -->
+                        <ng-container matColumnDef="customer">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Customer </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Customer"> {{order.customer}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Restart Column -->
+                        <ng-container matColumnDef="resume">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Resume </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Resume">
+                                <span *ngIf="order.resume">
+                                    {{order.resume | date:'dd-MM-yyyy'}}
+                                </span>
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="displayedColumnsPaused"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumnsPaused;" (click)="showDetails(row)">
+                        </mat-row>
+                    </mat-table>
+
+                    <mat-paginator #pausedPaginator [pageSizeOptions]="[25, 50, 100]" showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+
+                <div [hidden]="dataLoaded" class="skeleton-border">
+                    <skc-table [skc-loading]="true" [skc-rows]="5" [skc-shadow-table]="false" [skc-footer]="true"
+                        [skc-columns]="6" [skc-headers]="displayedColumnsPaused">
+                    </skc-table>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Canceled ({{dataSourceCanceled?.data.length}})">
+            <div class="container">
+                <div class="row">
+                    <div class="col-10">
+                        <mat-form-field>
+                            <mat-label>Filter</mat-label>
+                            <input matInput (keyup)="applyFilter($event, 'canceled')" placeholder="Ex. name"
+                                [disabled]="!dataLoaded || showArchivedCancelations">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2 d-flex justify-content-end">
+                        <button mat-icon-button class="mt-3" [disabled]="!dataLoaded" (click)="exportToExcel('Canceled')">
+                            <mat-icon>file_download</mat-icon>
+                        </button>
+                        <button mat-icon-button [matMenuTriggerFor]="menuArchiveCanceled" class="mt-3"
+                            [disabled]="!dataLoaded">
+                            <mat-icon matTooltip="More">more_vert</mat-icon>
+                        </button>
+                        <mat-menu #menuArchiveCanceled="matMenu">
+                            <button mat-menu-item (click)="showArchivedCancelations = !showArchivedCancelations">
+                                <div *ngIf="!showArchivedCancelations">
+                                    Show archived orders
+                                </div>
+                                <div *ngIf="showArchivedCancelations">
+                                    Hide archived orders
+                                </div>
+                            </button>
+                        </mat-menu>
+                    </div>
+                </div>
+                <div [hidden]="!dataLoaded">
+                    <div *ngIf="!showArchivedCancelations">
+                        <mat-table [dataSource]="dataSourceCanceled" matSort #canceledSort="matSort" class="block">
+
+                            <!-- Ref Column -->
+                            <ng-container matColumnDef="orderRef">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Order Ref </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Reference"> {{order.orderRef}} </mat-cell>
+                            </ng-container>
+
+                            <!-- Box Column -->
+                            <ng-container matColumnDef="boxName">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Box </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Box"> {{order.boxName}} </mat-cell>
+                            </ng-container>
+
+                            <!-- Plan Column -->
+                            <ng-container matColumnDef="paymentPlan">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Payment Plan </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Plan">
+                                    <span *ngIf="order.paymentPlan == 0">Free referral box</span>
+                                    <span *ngIf="order.paymentPlan == 1">Monthly</span>
+                                    <span *ngIf="order.paymentPlan > 1">
+                                        {{order.paymentPlan}} month plan
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- Customer Column -->
+                            <ng-container matColumnDef="customer">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Customer </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Customer"> {{order.customer}} </mat-cell>
+                            </ng-container>
+
+                            <!-- Canceled at Column -->
+                            <ng-container matColumnDef="canceledAt">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Canceled on </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Canceled on">
+                                    <span *ngIf="order.canceledAt">
+                                        {{order.canceledAt | date:'dd-MM-yyyy'}}
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- Cancel reason Column -->
+                            <ng-container matColumnDef="cancelReason">
+                                <mat-header-cell *matHeaderCellDef> Cancel reason </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Cancel reason">
+                                    {{order.fullOrder.subscriptionDetails?.cancelReason}} </mat-cell>
+                            </ng-container>
+
+                            <mat-header-row *matHeaderRowDef="displayedColumnsCanceled"></mat-header-row>
+                            <mat-row *matRowDef="let row; columns: displayedColumnsCanceled;"
+                                (click)="showDetails(row)">
+                            </mat-row>
+                        </mat-table>
+
+                        <mat-paginator #canceledPaginator [pageSizeOptions]="[25, 50, 100]" showFirstLastButtons>
+                        </mat-paginator>
+                    </div>
+
+                    <div *ngIf="showArchivedCancelations">
+                        <h5>Archived orders</h5>
+                        <mat-table [dataSource]="dataSourceArchivedCancelations" class="block">
+
+                            <!-- Ref Column -->
+                            <ng-container matColumnDef="orderRef">
+                                <mat-header-cell *matHeaderCellDef> Order Ref </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Reference"> {{order.orderRef}} </mat-cell>
+                            </ng-container>
+
+                            <!-- Box Column -->
+                            <ng-container matColumnDef="boxName">
+                                <mat-header-cell *matHeaderCellDef> Box </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Box"> {{order.boxName}} </mat-cell>
+                            </ng-container>
+
+                            <!-- Plan Column -->
+                            <ng-container matColumnDef="paymentPlan">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Payment Plan </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Plan">
+                                    <span *ngIf="order.paymentPlan == 0">Free referral box</span>
+                                    <span *ngIf="order.paymentPlan == 1">Monthly</span>
+                                    <span *ngIf="order.paymentPlan > 1">
+                                        {{order.paymentPlan}} month plan
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- Customer Column -->
+                            <ng-container matColumnDef="customer">
+                                <mat-header-cell *matHeaderCellDef> Customer </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Customer"> {{order.customer}} </mat-cell>
+                            </ng-container>
+
+                            <!-- Canceled at Column -->
+                            <ng-container matColumnDef="canceledAt">
+                                <mat-header-cell *matHeaderCellDef> Canceled on </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Canceled on">
+                                    <span *ngIf="order.canceledAt">
+                                        {{order.canceledAt | date:'dd-MM-yyyy'}}
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- Cancel reason Column -->
+                            <ng-container matColumnDef="cancelReason">
+                                <mat-header-cell *matHeaderCellDef> Cancel reason </mat-header-cell>
+                                <mat-cell *matCellDef="let order" data-label="Cancel reason">
+                                    {{order.fullOrder.subscriptionDetails?.cancelReason}} </mat-cell>
+                            </ng-container>
+
+                            <mat-header-row *matHeaderRowDef="displayedColumnsCanceled"></mat-header-row>
+                            <mat-row *matRowDef="let row; columns: displayedColumnsCanceled;"
+                                (click)="showDetails(row)">
+                            </mat-row>
+                        </mat-table>
+                    </div>
+                </div>
+                <div [hidden]="dataLoaded" class="skeleton-border">
+                    <skc-table [skc-loading]="true" [skc-rows]="5" [skc-shadow-table]="false" [skc-footer]="true"
+                        [skc-columns]="5" [skc-headers]="displayedColumnsCanceled">
+                    </skc-table>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Other">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <mat-form-field>
+                            <mat-label>Filter</mat-label>
+                            <input matInput (keyup)="applyFilter($event, 'active')"
+                                placeholder="Search by ID, reference, customer, box, etc." [disabled]="!dataLoaded">
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div [hidden]="!dataLoaded">
+                    <h5>Open Payments</h5>
+                    <mat-table [dataSource]="dataSourceOther" class="block">
+
+                        <!-- Ref Column -->
+                        <ng-container matColumnDef="orderRef">
+                            <mat-header-cell *matHeaderCellDef> Order Ref </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Reference"> {{order.orderRef}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Box Column -->
+                        <ng-container matColumnDef="boxName">
+                            <mat-header-cell *matHeaderCellDef> Box </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Box"> {{order.boxName}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Customer Column -->
+                        <ng-container matColumnDef="customer">
+                            <mat-header-cell *matHeaderCellDef> Customer </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Customer"> {{order.customer}} </mat-cell>
+                        </ng-container>
+
+                        <!-- Canceled at Column -->
+                        <ng-container matColumnDef="paymentsDue">
+                            <mat-header-cell *matHeaderCellDef> Payments Due </mat-header-cell>
+                            <mat-cell *matCellDef="let order" data-label="Payments Due">
+                                <span *ngIf="order.openPayments">
+                                    {{order.openPayments}}
+                                </span>
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="displayedColumnsOther"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumnsOther;" (click)="showDetails(row)">
+                        </mat-row>
+                    </mat-table>
+                </div>
+
+                <div [hidden]="dataLoaded" class="skeleton-border">
+                    <skc-table [skc-loading]="true" [skc-rows]="5" [skc-shadow-table]="false" [skc-footer]="true"
+                        [skc-columns]="6" [skc-headers]="displayedColumns">
+                    </skc-table>
+                </div>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>

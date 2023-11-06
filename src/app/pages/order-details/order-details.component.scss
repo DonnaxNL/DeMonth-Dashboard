@@ -1,0 +1,58 @@
+.block {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+}
+
+.special-padding {
+  padding-top: 1.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+}
+
+.redirect-row:hover {
+  cursor: pointer;
+  background-color: #feeeed;
+}
+
+.actions {
+  padding: 0px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.section-table {
+  padding: 1.5rem;
+}
+
+@media (max-width: 800px) {
+  // .actions {
+  //   justify-content: center;
+  // }
+
+  .section-table {
+    padding-top: 1.5rem;
+    padding-left: 0rem;
+    padding-right: 0rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .side-padding {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}

@@ -1,0 +1,63 @@
+<!-- Default dialog -->
+<h2 *ngIf="!savingState" mat-dialog-title>Change cycle</h2>
+<div *ngIf="!savingState" mat-dialog-content>
+    <p>Match the deliveries with their menstrual cycle.<br>
+        This change will go into effect for the next delivery.
+    </p>
+    <mat-form-field class="col-12 mt-2 d-flex justify-content-center">
+        <mat-select placeholder="Select amount of days" [(ngModel)]="data.days"
+            (ngModelChange)="onSelectChanged($event)">
+            <mat-option *ngFor="let number of noDays" [value]="number">
+                {{number}}
+            </mat-option>
+        </mat-select>
+        <mat-error>You must make a selection.</mat-error>
+    </mat-form-field>
+    <p>Or reset cycle date</p>
+    <mat-form-field class="col-12 mt-2 d-flex justify-content-center">
+        <input matInput [matDatepicker]="picker" [min]="minDate"
+            [(ngModel)]="datePicker" placeholder="Start next delivery on:"
+            (dateChange)="datePickerEvent('change', $event)">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error>Please select a delivery date.</mat-error>
+    </mat-form-field>
+    <hr>
+    <p>Next delivery date</p>
+    <div class="row mt-2">
+        <p class="col-5 d-flex justify-content-end">{{currentDeliveryDate | date:'dd-MM-yyyy' }}</p>
+        <i class="col-2 my-auto d-flex justify-content-center fas fa-arrow-right"></i>
+        <p *ngIf="newDeliveryDate >= minDate" class="col-5">{{newDeliveryDate | date:'dd-MM-yyyy' }}</p>
+        <p *ngIf="newDeliveryDate < minDate" class="col-5" style="color: red;">
+            {{newDeliveryDate | date:'dd-MM-yyyy' }}
+        </p>
+    </div>
+    <p *ngIf="newDeliveryDate < minDate">New delivery date needs to be at least 7 days away from today.</p>
+    <hr>
+    <mat-checkbox [(ngModel)]="notifySlack"
+        style="font-family: Futura, Lato, Helvetica Neue, Helvetica, Arial, sans-serif; color: #545454;">
+        Notify this change to DeMonth Slack.
+    </mat-checkbox>
+</div>
+<!-- Saving state -->
+<h2 *ngIf="savingState && !loadingDone" mat-dialog-title>Saving changes...</h2>
+<div *ngIf="savingState && !loadingDone" mat-dialog-content>
+    <div class="col-12 d-flex justify-content-center">
+        <mat-spinner></mat-spinner>
+    </div>
+    <p class="col-12 d-flex justify-content-center">Please wait...</p>
+</div>
+<!-- Saved state -->
+<h2 *ngIf="loadingDone" mat-dialog-title>Changes saved!</h2>
+<div *ngIf="loadingDone" mat-dialog-content>
+    <p *ngIf="newNextDeliveryDate" class="col-12 d-flex justify-content-center">
+        This change will go into effect for the next delivery.<br>
+        Next payment will be on {{ newNextDeliveryDate | date:'d MMMM yyyy'}}.
+    </p>
+</div>
+<!-- Actions -->
+<div mat-dialog-actions style="justify-content: flex-end;">
+    <button mat-button *ngIf="!loadingDone" (click)="onNoClick()" [disabled]="savingState">Cancel</button>
+    <button mat-raised-button color="primary" *ngIf="!savingState" (click)="changeDays()">Save</button>
+    <button mat-button *ngIf="loadingDone" [mat-dialog-close]="data">Close</button>
+</div>
